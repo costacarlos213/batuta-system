@@ -11,7 +11,8 @@ const Sidebar: React.FC = () => {
       py={[3, 10]}
       px={[3, 3, 3, 3, 4]}
       bg="green.400"
-      w="fit-content"
+      w={['full', 'fit-content']}
+      h={['min', 'full']}
       as="aside"
       float="left"
       position="sticky"
@@ -24,11 +25,16 @@ const Sidebar: React.FC = () => {
         align={['center', 'flex-start']}
         direction={['row', 'column']}
         justify={['center', 'flex-start']}
-        w={['100vw', 'min-content']}
-        h={['min-content', '100vh']}
+        w={['full', 'min-content']}
+        h={['min-content', 'full']}
       >
-        <MenuItem to="/" as="span">
-          <Icon as={Home} color="white" boxSize={['7', '7', '7', '7', '10']} />
+        <MenuItem to="/dashboard" as="span">
+          <Icon
+            as={Home}
+            color="white"
+            boxSize={['7', '7', '7', '7', '10']}
+            fill="white"
+          />
         </MenuItem>
         <MenuItem to="/search" as="span">
           <Icon

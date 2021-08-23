@@ -2,14 +2,14 @@ import { extendTheme } from '@chakra-ui/react'
 import { css } from '@emotion/react'
 
 export const scrollBarStyles = css`
-  :root::-webkit-scrollbar-track {
+  *::-webkit-scrollbar-track {
     background-color: #f4f4f4;
   }
-  :root::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     width: 5px;
     background: #f4f4f4;
   }
-  :root::-webkit-scrollbar-thumb {
+  *::-webkit-scrollbar-thumb {
     background: #c0c0c0;
     border-radius: 15px;
   }
@@ -20,6 +20,17 @@ const theme = extendTheme({
     global: {
       body: {
         bg: '#f2f2f2'
+      },
+      '*': {
+        borderSizing: 'border-box !important'
+      },
+      td: {
+        textAlign: 'center !important',
+        border: '1px'
+      },
+      th: {
+        textAlign: 'center !important',
+        border: '1px'
       }
     }
   },

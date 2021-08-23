@@ -21,22 +21,22 @@ const Navbar: React.FC<FlexProps> = props => {
     >
       <HStack spacing="12" flexDirection="row" align="center" justify="center">
         <MenuItem
-          to="/"
+          to="/dashboard"
           fontWeight="bold"
           fontSize={['2xl', '2xl', '2xl', '2xl', '4xl']}
         >
           Dashboard
         </MenuItem>
-        <MenuItem to="/" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
+        <MenuItem to="/print" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
           Relatório
         </MenuItem>
-        <MenuItem to="/" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
+        <MenuItem to="/search" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
           Pesquisar
         </MenuItem>
       </HStack>
       <Box>
         <MenuItem
-          to="/"
+          to="/new"
           fontWeight="medium"
           fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}
           color="green.400"
