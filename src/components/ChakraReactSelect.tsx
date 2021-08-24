@@ -1,36 +1,52 @@
 import React from 'react'
+import { Control, Controller, UseFormRegisterReturn } from 'react-hook-form'
 import { OptionTypeBase } from 'react-select'
 import Select from 'react-select/creatable'
 
 import { Box } from '@chakra-ui/layout'
 import { customStyles } from 'src/styles/select'
 
+import { UseFormType } from '../../@types/pedidos'
+
 interface IReactSelect {
   placeholder?: string
+  width?: string | string[]
   options: OptionTypeBase[]
-  onChangeEvent: (
-    newValue: OptionTypeBase,
-    { action }: { action: string }
-  ) => void
+  /* eslint-disable */
+  control?: Control<UseFormType, object>
+  /* eslint-enable */
+  onCreateEvent: (inputValue: string) => void
 }
 
-const ChakraReactSelect: React.FC<IReactSelect> = ({
-  onChangeEvent,
+const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
+  onCreateEvent,
   options,
-  placeholder = ''
+  placeholder = '',
+  width = 'full',
+  control,
+  name
 }) => {
   return (
-    <Box
-      as={Select}
-      isClearable
-      isSearchable
-      options={options}
-      placeholder={placeholder}
-      styles={customStyles}
+    <Controller
+      control={control}
       /* eslint-disable */
-      // @ts-ignore: Unreachable code error
-      onChange={onChangeEvent}
+      name={name as any}
       /* eslint-enable */
+      render={({ field: { onChange, value, ...rest } }) => (
+        <Box width={width}>
+          <Select
+            styles={customStyles}
+            isClearable
+            isSearchable
+            onCreateOption={onCreateEvent}
+            options={options}
+            placeholder={placeholder}
+            onChange={e => onChange(e?.value)}
+            {...rest}
+            value={options.find(c => c.value === value)}
+          />
+        </Box>
+      )}
     />
   )
 }

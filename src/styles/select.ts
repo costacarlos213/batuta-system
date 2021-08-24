@@ -3,9 +3,14 @@ import { OptionTypeBase, StylesConfig } from 'react-select'
 import theme from './globals'
 
 const customStyles: StylesConfig<OptionTypeBase, false> = {
+  menu: provided => ({
+    ...provided,
+    zIndex: 9999
+  }),
+
   control: provided => ({
     ...provided,
-    height: 45,
+    height: 40,
     borderTop: 0,
     borderLeft: 0,
     borderRight: 0,
@@ -13,6 +18,7 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
     borderRadius: 0,
     width: theme.sizes.full,
     boxShadow: 'none',
+    paddingBottom: 1,
     ':hover': {
       borderColor: '#B3B3B3'
     }
@@ -35,7 +41,7 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
   valueContainer: provided => ({
     ...provided,
     height: 'min-content',
-    padding: theme.space[1],
+    paddingLeft: theme.space[1],
     display: 'flex',
     alignItems: 'center'
   }),

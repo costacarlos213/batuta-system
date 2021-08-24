@@ -3419,6 +3419,11 @@ react-focus-lock@2.5.0:
     use-callback-ref "^1.2.1"
     use-sidecar "^1.0.1"
 
+react-hook-form@^7.13.0:
+  version "7.13.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.13.0.tgz#af451e4771af2ddcb4ccb2f6a11eeb191c66bbdc"
+  integrity sha512-ofjzl78xNTRmBHFZ/gOn65HDiqM/LHxbVMlaFoemyMQIDFTR4aG4h2CpCG/N0TbW5IQbh21hBYUvvmqK0ByEhg==
+
 react-input-autosize@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-3.0.0.tgz#6b5898c790d4478d69420b55441fcc31d5c50a85"

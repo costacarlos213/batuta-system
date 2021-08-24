@@ -1,35 +1,54 @@
-import React, { useState } from 'react'
-import { OptionTypeBase } from 'react-select'
+import React from 'react'
+import { Plus } from 'react-feather'
+import { useFieldArray, useForm } from 'react-hook-form'
 
-import { Box, Heading, Stack } from '@chakra-ui/react'
-import ChakraReactSelect from 'src/components/ChakraReactSelect'
+import { Box, Button, Heading, Icon } from '@chakra-ui/react'
+import FieldsContainer from 'src/components/FieldsContainer'
 
-import Input from '../components/FormInput'
+import { UseFormType } from '../../@types/pedidos'
 
 const New: React.FC = () => {
-  const [, setVendorValue] = useState({})
-
-  const options: OptionTypeBase[] = [
-    { value: 'camila', label: 'Camila' },
-    { value: 'carlos', label: 'Carlos' },
-    { value: 'thiago', label: 'Thiago' }
-  ]
-
-  const [stateOptions, setOptions] = useState(options)
-
-  const handleChange = (newValue: OptionTypeBase, { action = '' }) => {
-    newValue ? setVendorValue(newValue) : setVendorValue({})
-
-    console.group('Value Changed')
-    console.log(newValue)
-    console.log(action)
-    console.groupEnd()
-
-    if (action === 'create-option') {
-      setOptions([...stateOptions, newValue])
+  const { register, handleSubmit, formState, control } = useForm<UseFormType>({
+    defaultValues: {
+      pedidos: [
+        {
+          code: undefined,
+          address: undefined,
+          customerName: undefined,
+          delivery: undefined,
+          description: undefined,
+          file_: undefined,
+          payment: undefined,
+          phone: undefined,
+          value: undefined,
+          vendor: undefined
+        }
+      ]
     }
-  }
+  })
 
+  const { fields, append } = useFieldArray({
+    control,
+    name: 'pedidos',
+    keyName: 'id'
+  })
+
+  const onSubmit = handleSubmit(data => console.log(data))
+
+  function addNewFormSection() {
+    append({
+      code: undefined,
+      address: undefined,
+      customerName: undefined,
+      delivery: undefined,
+      description: undefined,
+      file_: undefined,
+      payment: undefined,
+      phone: undefined,
+      value: undefined,
+      vendor: undefined
+    })
+  }
   return (
     <Box
       as="main"
@@ -45,35 +64,68 @@ const New: React.FC = () => {
       justifyContent={['center', 'flex-start']}
       overflowX={['scroll', 'hidden']}
     >
-      <Heading as="h1" fontWeight="medium" fontSize="x-large" mb="8">
-        Cadastro de Pedidos
-      </Heading>
-      <Stack spacing="5" as="form">
-        <Input placeholder="Nome do cliente" />
-        <Input placeholder="Telefone" />
-        <Input placeholder="Endereço" />
-        <ChakraReactSelect
-          placeholder="Vendedor"
-          onChangeEvent={handleChange}
-          options={stateOptions}
-        />
-        <ChakraReactSelect
-          placeholder="Descrição"
-          onChangeEvent={handleChange}
-          options={stateOptions}
-        />
-        <Input placeholder="Valor" />
-        <ChakraReactSelect
-          placeholder="Forma de pagamento"
-          onChangeEvent={handleChange}
-          options={stateOptions}
-        />
-        <ChakraReactSelect
-          placeholder="Forma de entrega"
-          onChangeEvent={handleChange}
-          options={stateOptions}
-        />
-      </Stack>
+      <form
+        onSubmit={onSubmit}
+        style={{
+          height: '100%'
+        }}
+        id="newForm"
+      >
+        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="8">
+          Cadastro de pedidos
+        </Heading>
+
+        {fields.map((field, index) => {
+          if (fields.length === index + 1) {
+            return (
+              <FieldsContainer
+                control={control}
+                key={field.id}
+                register={register}
+                index={index}
+                formState={formState}
+                border={false}
+                withImages
+              />
+            )
+          } else {
+            return (
+              <FieldsContainer
+                index={index}
+                key={field.id}
+                register={register}
+                formState={formState}
+                border
+                withImages
+              />
+            )
+          }
+        })}
+        <Button
+          onClick={addNewFormSection}
+          bg="transparent"
+          p="0"
+          mr="5"
+          _hover={{
+            color: 'black'
+          }}
+        >
+          <Icon as={Plus} mr="1" />
+          Adicionar
+        </Button>
+        <Button
+          type="submit"
+          bg="transparent"
+          p="0"
+          mr="3"
+          color="whatsapp.500"
+          _hover={{
+            color: 'green.400'
+          }}
+        >
+          Enviar
+        </Button>
+      </form>
     </Box>
   )
 }
