@@ -22,7 +22,7 @@ export class Code {
       return false
     }
 
-    const tester = /^[A-Z]\d+/s
+    const tester = /^[A-Z]\d+$/s
 
     if (!tester.test(code)) {
       return false
