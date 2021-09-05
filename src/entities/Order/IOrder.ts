@@ -13,4 +13,5 @@ export interface IOrder {
   payment: string
   address: string
   phone: string
+  cpf: string
 }

@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { StringType } from "../StringType"
 import { Address } from "./Address"
 import { Code } from "./Code"
+import { CPF } from "./CPF"
 import { IOrder } from "./IOrder"
 import { Phone } from "./Phone"
 
@@ -20,6 +21,7 @@ export class Order {
     public readonly Payment: StringType,
     public readonly Address: Address,
     public readonly Phone: Phone,
+    public readonly CPF: CPF,
     public readonly Comments?: string,
     date?: string,
     id?: ObjectId
@@ -54,6 +56,7 @@ export class Order {
       address,
       payment,
       phone,
+      cpf,
       id
     } = orderData
 
@@ -66,7 +69,8 @@ export class Order {
       !total ||
       !address ||
       !payment ||
-      !phone
+      !phone ||
+      !cpf
     ) {
       throw new Error("Missing create options")
     }
@@ -79,6 +83,7 @@ export class Order {
     const formatedPayment = StringType.create(payment.trim())
     const formatedPhone = Phone.create(phone.trim())
     const formatedCode = Code.create(cod.trim())
+    const formatedCpf = CPF.create(cpf)
 
     return new Order(
       formatedVendor,
@@ -90,6 +95,7 @@ export class Order {
       formatedPayment,
       formatedAddress,
       formatedPhone,
+      formatedCpf,
       comments,
       date,
       id

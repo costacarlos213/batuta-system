@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express"
 import { createOrderController } from "./main/createOrder"
+import { printSimpleController } from "./main/printSimple"
 import { createUserController } from "./main/createUser"
 import { loginController } from "./main/login"
 import { logoutController } from "./main/logout"
@@ -29,6 +30,10 @@ router.get("/auth/logout", verifyToken, async (req, res) => {
 
 router.get("/token", verifyRefreshToken, async (req, res) => {
   return await refreshTokenController.handle(req, res)
+})
+
+router.post("/print", async (req, res) => {
+  return await printSimpleController.handle(req, res)
 })
 
 export { router }

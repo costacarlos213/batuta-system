@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken"
-import { generateAccessToken } from "src/providers/token/AccessTokenProvider"
-import { ITokenRepository } from "src/repositories/tokenRepository/ITokenRepository"
+import { generateAccessToken } from "../../providers/token/AccessTokenProvider"
+import { ITokenRepository } from "../../repositories/tokenRepository/ITokenRepository"
 import { IRefreshTokenDTO } from "./RefreshTokenUseCaseDTO"
 
 export class RefreshTokenUseCase {
