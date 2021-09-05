@@ -1,18 +1,18 @@
 import { Request, Response } from "express"
-import { PrintSimpleUseCase } from "../useCases/printSimple/PrintSimpleUseCase"
+import { CreatePDFUseCase } from "src/useCases/createPDF/createPDFUseCase"
 
-export class PrintSimpleController {
-  constructor(private printSimpleUseCase: PrintSimpleUseCase) {}
+export class CreatePDFController {
+  constructor(private createPDFUseCase: CreatePDFUseCase) {}
 
   async handle(req: Request, res: Response): Promise<Response> {
-    if (!req.body) {
+    if (!req.body || !req.body.pdfType) {
       return res.status(400).json({
         message: "Missing params."
       })
     }
 
     try {
-      const pdf = await this.printSimpleUseCase.execute(req.body)
+      const pdf = await this.createPDFUseCase.execute(req.body)
 
       res.set("Content-Type", "application/pdf")
 

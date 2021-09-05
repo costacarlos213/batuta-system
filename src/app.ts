@@ -10,6 +10,7 @@ dotenv.config()
 
 app.use(cors())
 app.use("/static", express.static(path.join(__dirname, "/assets")))
+app.use(express.urlencoded({ extended: true }))
 app.use(json())
 app.use(router)
 

@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { SimpleTableContent } from "src/@types/table"
 
 export function generateSimpleTable(tableContent: SimpleTableContent): string {
@@ -10,13 +11,13 @@ export function generateSimpleTable(tableContent: SimpleTableContent): string {
     return tableRows.push(`
         <tr>
           <td class="tbodyColumn">
-            ${row.code}
+            ${row.cod}
           </td>
           <td class="tbodyColumn">
-            ${row.date}
+            ${dayjs(row.date).format("DD/MM/YYYY")}
           </td>
           <td class="tbodyColumn">
-            ${row.name}
+            ${row.customerName}
           </td>
           <td class="tbodyColumn">
             ${row.vendor}

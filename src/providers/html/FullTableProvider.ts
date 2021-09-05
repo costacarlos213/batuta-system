@@ -20,7 +20,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
               Cód
             </td>
             <td class="tbodyColumn">
-              ${table.code}
+              ${table.cod}
             </td>
             <td id="imgCell" rowspan="8">
               <img src="http://localhost:3333/static/ENEM.jpg"/>
@@ -31,7 +31,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
               Nome
             </td>
             <td class="tbodyColumn">
-              ${table.name}
+              ${table.customerName}
             </td>
           </tr>
           <tr>
@@ -131,13 +131,12 @@ export function generateFullTable(tableContent: FullTableContent): string {
   
       article {
         width: 430px;
-        margin-right: 60px;
-        margin-bottom: 60px;
+        margin-right: 30px;
+        margin-bottom: 65px;
       }
   
       img {
         object-fit: cover;
-        border-right: solid 1px black;
         width: 100%;
       }
   
@@ -165,12 +164,15 @@ export function generateFullTable(tableContent: FullTableContent): string {
         border: solid 1px black;
         width: 320px;
         height: 420px;
+        padding: 1px;
       }
     </style>
   </head>
   <body>
     <main>
-        
+        ${articles.map(article => {
+          return article
+        })}
     </main>
   </body>
   </html>`

@@ -1,9 +1,9 @@
 export type SimpleTableContent = Array<{
-  code: string
+  cod: string
   date: string
   delivery: string
   description: string
-  name: string
+  customerName: string
   vendor: string
   total: number
 }>
@@ -12,11 +12,11 @@ export type FullTableContent = Array<{
   address: string
   payment: string
   phone: string
-  code: string
+  cod: string
   date: string
   delivery: string
   description: string
-  name: string
+  customerName: string
   vendor: string
   total: number
 }>

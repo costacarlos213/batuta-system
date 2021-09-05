@@ -16,13 +16,14 @@ model Order {
   cod          String
   customerName String
   description  String
-  total        Decimal
+  total        Float
   delivery     String
   payment      String
   address      String
   phone        String
   comments     String?
   date         String
+  vendor       String
 }
 
 model User {

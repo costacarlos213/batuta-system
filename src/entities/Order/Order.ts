@@ -21,7 +21,7 @@ export class Order {
     public readonly Payment: StringType,
     public readonly Address: Address,
     public readonly Phone: Phone,
-    public readonly CPF: CPF,
+    public readonly CPF?: CPF,
     public readonly Comments?: string,
     date?: string,
     id?: ObjectId
@@ -69,8 +69,7 @@ export class Order {
       !total ||
       !address ||
       !payment ||
-      !phone ||
-      !cpf
+      !phone
     ) {
       throw new Error("Missing create options")
     }
@@ -83,7 +82,11 @@ export class Order {
     const formatedPayment = StringType.create(payment.trim())
     const formatedPhone = Phone.create(phone.trim())
     const formatedCode = Code.create(cod.trim())
-    const formatedCpf = CPF.create(cpf)
+    let formatedCpf: CPF
+
+    if (cpf) {
+      formatedCpf = CPF.create(cpf)
+    }
 
     return new Order(
       formatedVendor,

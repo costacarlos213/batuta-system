@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
-import { ICreateOrderDTO } from "src/useCases/createOrder/CreateOrderDTO"
 import { CreateOrderUseCase } from "src/useCases/createOrder/CreateOrderUseCase"
 
 export class CreateOrderController {
   constructor(private createOrderUseCase: CreateOrderUseCase) {}
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const orderData: ICreateOrderDTO = req.body
+    const orderData = req.body
+    orderData.total = parseFloat(orderData.total)
 
     if (!orderData) {
       res.status(400).json({

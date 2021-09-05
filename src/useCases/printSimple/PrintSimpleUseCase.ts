@@ -15,7 +15,6 @@ export class PrintSimpleUseCase {
     const pdfBuffer = await page.pdf({
       format: "a4",
       printBackground: true,
-      scale: 0.7,
       margin: {
         top: "2cm",
         left: "1cm",
