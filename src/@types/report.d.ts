@@ -13,4 +13,5 @@ export interface IFilters {
   payment?: string
   delivery?: string
   timeInterval?: ITimeInterval
+  id?: string
 }

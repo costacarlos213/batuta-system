@@ -40,6 +40,11 @@ export function generateSimpleTable(tableContent: SimpleTableContent): string {
       <html>
       <body>
         <style>
+          * {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+          }
+
           table {
             border: solid 2px black;
             border-collapse: collapse;

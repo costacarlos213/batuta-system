@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script>
+    document.addEventListener('scroll', () => {
+      console.log('a')
+    })
+  </script>
   <style>
     th {
       background-color: green;
@@ -33,10 +38,6 @@
       margin-bottom: 60px;
     }
 
-    img {
-      object-fit: cover;
-      width: 100%;
-    }
 
     p {
       white-space: pre-line;
@@ -62,6 +63,24 @@
       border: solid 2px black;
       width: 320px;
       height: 420px;
+      padding: 1px;
+
+    }
+
+    img {
+      object-fit: contain;
+      width: 100%;
+      max-height: 320px;
+    }
+
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      height: 100%;
+    }
+
+    .flexChild {
+      flex: 1
     }
   </style>
 </head>
@@ -85,7 +104,14 @@
               C436
             </td>
             <td id="imgCell" rowspan="8">
-              <img src="../../assets/ENEM.jpg"/>
+              <div class="flex">
+                <div class="flexChild">
+                  <img src="../../public/uploads/67826c00-9c4b-49b3-8cd1-2c3f4fd379a4-bebidas.png"/>
+                </div>
+                <div class="flexChild">
+                  <img src="../../public/uploads/67826c00-9c4b-49b3-8cd1-2c3f4fd379a4-bebidas.png"/>
+                </div>
+              </div>
             </td>
           </tr>
           <tr>
@@ -179,7 +205,11 @@ Eucaliptos - Fazenda Rio Grande - PR,
               C436
             </td>
             <td id="imgCell" rowspan="8">
-              <img src="../../assets/ENEM.jpg"/>
+              <div class="flex">
+                <div class="flexChild">
+                  <img src="../../public/uploads/4468d647-ee9b-4ef7-8240-94dd45c9dd72-carvão.jpeg"/>
+                </div>
+              </div>
             </td>
           </tr>
           <tr>

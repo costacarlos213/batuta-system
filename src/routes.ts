@@ -10,6 +10,9 @@ import { verifyToken } from "./middlewares/verifyToken"
 import { getOrdersController } from "./main/getOrders"
 import { createPDFController } from "./main/createPDF"
 import { uploadFileMiddleware } from "./middlewares/uploadFile"
+import { updateOrderController } from "./main/updateOrder"
+import { deleteOrderController } from "./main/deleteOrder"
+import { countOrdersController } from "./main/CountOrders"
 
 const router = Router()
 
@@ -19,7 +22,7 @@ router.post("/user", async (req: Request, res: Response) => {
 
 router.post(
   "/order",
-  uploadFileMiddleware,
+  [verifyToken, uploadFileMiddleware],
   async (req: Request, res: Response) => {
     return await createOrderController.handle(req, res)
   }
@@ -27,6 +30,18 @@ router.post(
 
 router.get("/order", async (req, res) => {
   return await getOrdersController.handle(req, res)
+})
+
+router.get("/order/count", verifyToken, async (req, res) => {
+  return await countOrdersController.handle(req, res)
+})
+
+router.put("/order", uploadFileMiddleware, async (req, res) => {
+  return await updateOrderController.handle(req, res)
+})
+
+router.delete("/order", async (req, res) => {
+  return await deleteOrderController.handle(req, res)
 })
 
 // Auth routes
@@ -43,11 +58,11 @@ router.get("/token", verifyRefreshToken, async (req, res) => {
   return await refreshTokenController.handle(req, res)
 })
 
-router.post("/print", async (req, res) => {
+router.post("/print", verifyToken, async (req, res) => {
   return await printSimpleController.handle(req, res)
 })
 
-router.post("/pdf", async (req, res) => {
+router.post("/pdf", verifyToken, async (req, res) => {
   return await createPDFController.handle(req, res)
 })
 

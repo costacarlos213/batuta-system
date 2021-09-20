@@ -19,4 +19,7 @@ export type FullTableContent = Array<{
   customerName: string
   vendor: string
   total: number
+  color: "green" | "yellow"
+  title: string
+  fileKeys: string[]
 }>

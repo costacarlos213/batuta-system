@@ -23,6 +23,7 @@ class Phone {
     }
 
     const cleanPhone = phone.replace(/[\s().-]+/g, "")
+    const cleanerPhone = phone.replace(/\D+/g, "")
 
     const tester =
       /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/

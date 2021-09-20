@@ -10,11 +10,15 @@ export async function verifyToken(
   try {
     const authToken = req.headers.authorization
 
-    if (!authToken) throw new Error("Token is missing")
+    if (!authToken)
+      return res.status(401).json({
+        message: "Invalid Session",
+        data: "Missing access token"
+      })
 
     const token = req.headers.authorization.split(" ")[1]
 
-    const decoded = verify(token, process.env.JWT_AUTH_SECRET)
+    const decoded = await verify(token.trim(), process.env.JWT_AUTH_SECRET)
 
     req.body = {
       ...req.body,
@@ -22,21 +26,19 @@ export async function verifyToken(
       token
     }
 
-    const tokenRepository = new TokenRepository()
+    // const tokenRepository = new TokenRepository()
 
-    const blacklistedToken = await tokenRepository.get(
-      "BL_" + decoded.sub.toString()
-    )
+    // const blacklistedToken = await tokenRepository.get(
+    //   "BL_" + decoded.sub.toString()
+    // )
 
-    if (!blacklistedToken) {
-      next()
-    } else {
-      if (JSON.parse(blacklistedToken).token === token) {
-        return res
-          .status(401)
-          .json({ message: "Trying to login with blacklisted token" })
-      }
-    }
+    // if (blacklistedToken) {
+    //   if (JSON.parse(blacklistedToken).token === token) {
+    //     return res
+    //       .status(401)
+    //       .json({ message: "Trying to login with blacklisted token" })
+    //   }
+    // }
 
     next()
   } catch (error) {

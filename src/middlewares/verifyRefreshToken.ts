@@ -7,12 +7,15 @@ export async function verifyRefreshToken(
   res: Response,
   next: NextFunction
 ): Promise<void | Response> {
-  const refreshToken = req.body.refreshToken
+  const refreshToken = req.cookies.JID
 
   if (!refreshToken) return res.status(401).json({ message: "Missing token." })
 
   try {
-    const decoded = verify(refreshToken, process.env.JWT_REFRESH_SECRET)
+    const decoded = await verify(
+      refreshToken.toString(),
+      process.env.JWT_REFRESH_SECRET
+    )
 
     req.body = {
       ...req.body,
@@ -20,16 +23,16 @@ export async function verifyRefreshToken(
       refreshToken
     }
 
-    const tokenRepository = new TokenRepository()
+    // const tokenRepository = new TokenRepository()
 
-    const storedToken = await tokenRepository.get(decoded.sub.toString())
+    // const storedToken = await tokenRepository.get(decoded.sub.toString())
 
-    if (!storedToken) {
-      return res.status(401).json({ message: "Refresh token isn't stored." })
-    }
+    // if (!storedToken) {
+    //   return res.status(401).json({ message: "Refresh token isn't stored." })
+    // }
 
-    if (JSON.parse(storedToken).token !== refreshToken)
-      return res.status(401).json({ message: "Wrong refresh token." })
+    // if (JSON.parse(storedToken).token !== refreshToken)
+    //   return res.status(401).json({ message: "Wrong refresh token." })
 
     next()
   } catch (error) {

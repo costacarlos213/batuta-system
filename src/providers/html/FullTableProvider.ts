@@ -4,13 +4,28 @@ export function generateFullTable(tableContent: FullTableContent): string {
   const articles: string[] = []
 
   tableContent.map(table => {
+    function formatPhone(value) {
+      value = value.replace(/\D/g, "") // Remove tudo o que não é dígito
+      value = value.replace(/^(\d{2})(\d)/g, "($1) $2") // Coloca parênteses em volta dos dois primeiros dígitos
+      value = value.replace(/(\d)(\d{4})$/, "$1-$2") // Coloca hífen entre o quarto e o quinto dígitos
+      return value
+    }
+
+    const phone = formatPhone(table.phone)
+
+    let images = ""
+
+    table.fileKeys.forEach(fileName => {
+      images += `<div class="flexChildren"><img src="${fileName}"/></div>`
+    })
+
     return articles.push(`
       <article>
       <table>
         <thead>
-          <th colspan="3">
+          <th colspan="3" style="background-color: ${table.color};">
             <h1>
-              Kit Grande
+              ${table.title.toUpperCase()}
             </h1>
           </th>
         </thead>
@@ -23,7 +38,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
               ${table.cod}
             </td>
             <td id="imgCell" rowspan="8">
-              <img src="http://localhost:3333/static/ENEM.jpg"/>
+              <div class="flex">${images}</div>
             </td>
           </tr>
           <tr>
@@ -57,7 +72,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
               Celular
             </td>
             <td class="tbodyColumn">
-            ${table.phone}
+            ${phone}
             </td>
           </tr>
           <tr>
@@ -105,7 +120,6 @@ export function generateFullTable(tableContent: FullTableContent): string {
   <head>
     <style>
       th {
-        background-color: green;
         height: 60px;
         font-size: large;
       }
@@ -135,11 +149,6 @@ export function generateFullTable(tableContent: FullTableContent): string {
         margin-bottom: 65px;
       }
   
-      img {
-        object-fit: cover;
-        width: 100%;
-      }
-  
       p {
         white-space: pre-line;
       }
@@ -165,6 +174,22 @@ export function generateFullTable(tableContent: FullTableContent): string {
         width: 320px;
         height: 420px;
         padding: 1px;
+      }
+  
+      img {
+        object-fit: contain;
+        width: 100%;
+        max-height: 320px;
+      }
+  
+      .flex {
+        display: flex;
+        flex-wrap: wrap;
+        height: 100%;
+      }
+  
+      .flexChildren {
+        flex: 1
       }
     </style>
   </head>

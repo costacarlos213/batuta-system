@@ -9,7 +9,9 @@ export class TokenRepository implements ITokenRepository {
   }
 
   async get(key: string): Promise<string> {
-    return "ok"
+    // const value = await redis.get(key)
+
+    return "000"
   }
 
   async del(key: string): Promise<void> {

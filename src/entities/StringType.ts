@@ -6,7 +6,10 @@ export class StringType {
 
     if (!isValid) throw new Error("Invalid String")
 
-    const cleanName = name.replace(/[^a-zA-Z ]/g, "")
+    const cleanName = name.replace(
+      /[^A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/g,
+      ""
+    )
 
     return new StringType(cleanName)
   }

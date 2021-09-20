@@ -6,7 +6,7 @@ export class GetOrdersUseCase {
   constructor(private orderRepository: IOrderRepository) {}
 
   async execute(filters: IFilters): Promise<Order[]> {
-    const orders = this.orderRepository.get(filters)
+    const orders = await this.orderRepository.get(filters)
 
     return orders
   }

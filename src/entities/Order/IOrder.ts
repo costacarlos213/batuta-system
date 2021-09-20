@@ -1,5 +1,12 @@
 import { ObjectId } from "bson"
 
+export interface IFilesInfo {
+  fileUrls: string[]
+  fileKeys: string[]
+}
+
+export type AllowedColors = "green" | "yellow"
+
 export interface IOrder {
   id?: ObjectId
   cod: string
@@ -13,5 +20,7 @@ export interface IOrder {
   payment: string
   address: string
   phone: string
-  cpf?: string
+  files: IFilesInfo
+  title: string
+  color: AllowedColors
 }
