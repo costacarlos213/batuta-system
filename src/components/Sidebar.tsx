@@ -1,5 +1,5 @@
 import React from 'react'
-import { Home, PlusCircle, Printer, Search } from 'react-feather'
+import { Home, PlusCircle, Search } from 'react-feather'
 
 import { Box, Icon, Stack } from '@chakra-ui/react'
 
@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
           <Icon
             as={Home}
             color="white"
-            boxSize={['7', '7', '7', '7', '10']}
+            boxSize={['7', '7', '7', '7', '7', '10']}
             fill="white"
           />
         </MenuItem>
@@ -40,21 +40,14 @@ const Sidebar: React.FC = () => {
           <Icon
             as={Search}
             color="white"
-            boxSize={['7', '7', '7', '7', '10']}
+            boxSize={['7', '7', '7', '7', '7', '10']}
           />
         </MenuItem>
         <MenuItem to="/new" as="span">
           <Icon
             as={PlusCircle}
             color="white"
-            boxSize={['7', '7', '7', '7', '10']}
-          />
-        </MenuItem>
-        <MenuItem to="/print" as="span">
-          <Icon
-            as={Printer}
-            color="white"
-            boxSize={['7', '7', '7', '7', '10']}
+            boxSize={['7', '7', '7', '7', '7', '10']}
           />
         </MenuItem>
       </Stack>

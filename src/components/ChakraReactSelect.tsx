@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Control, Controller, UseFormRegisterReturn } from 'react-hook-form'
 import { OptionTypeBase } from 'react-select'
 import Select from 'react-select/creatable'
@@ -10,40 +10,95 @@ import { UseFormType } from '../../@types/pedidos'
 
 interface IReactSelect {
   placeholder?: string
+  mr?: string | string[]
+  ml?: string | string[]
+  defaultOptions?: OptionTypeBase[]
+  defaultValue?: string
+  disabled?: boolean
   width?: string | string[]
-  options: OptionTypeBase[]
   /* eslint-disable */
   control?: Control<UseFormType, object>
   /* eslint-enable */
-  onCreateEvent: (inputValue: string) => void
 }
 
 const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
-  onCreateEvent,
-  options,
   placeholder = '',
+  disabled,
+  defaultOptions,
+  defaultValue,
+  ml,
+  mr,
   width = 'full',
   control,
   name
 }) => {
+  const [options, setOptions] = useState<OptionTypeBase[]>(defaultOptions || [])
+  const [selectValue, setValue] = useState<OptionTypeBase>({
+    label: defaultValue || placeholder,
+    value: defaultValue || placeholder
+  })
+
+  function capitalizeFirstLetter(value: string) {
+    const lowerCase = value.toLowerCase()
+    return lowerCase.charAt(0).toUpperCase() + lowerCase.slice(1)
+  }
+
+  const handleChange = (
+    newValue: OptionTypeBase,
+    actionMeta: {
+      action: string
+    }
+  ) => {
+    if (actionMeta.action === 'clear') {
+      setValue({
+        label: capitalizeFirstLetter(defaultValue || placeholder),
+        value: capitalizeFirstLetter(defaultValue || placeholder)
+      })
+    } else if (actionMeta.action === 'select-option') {
+      setValue({
+        label: newValue.label,
+        value: newValue.value
+      })
+    }
+  }
+
+  const handleCreate = (newValue: string) => {
+    const newOption = {
+      label: newValue,
+      value: newValue
+    }
+
+    setValue(newOption)
+    setOptions([...options, newOption])
+  }
+
   return (
     <Controller
       control={control}
+      defaultValue={defaultValue}
       /* eslint-disable */
       name={name as any}
       /* eslint-enable */
-      render={({ field: { onChange, value, ...rest } }) => (
-        <Box width={width}>
+      render={({ field: { onChange, ...rest } }) => (
+        <Box width={width} mr={mr} ml={ml}>
           <Select
+            isDisabled={disabled}
             styles={customStyles}
             isClearable
             isSearchable
-            onCreateOption={onCreateEvent}
+            onCreateOption={value => {
+              const capitalizedValue = capitalizeFirstLetter(value)
+              onChange(capitalizedValue)
+              handleCreate(capitalizedValue)
+            }}
             options={options}
             placeholder={placeholder}
-            onChange={e => onChange(e?.value)}
+            onChange={(value, actionMeta) => {
+              onChange(value?.value)
+              handleChange(value, actionMeta)
+            }}
             {...rest}
-            value={options.find(c => c.value === value)}
+            value={selectValue}
           />
         </Box>
       )}

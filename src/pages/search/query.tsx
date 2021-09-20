@@ -1,41 +1,18 @@
 import React, { useState } from 'react'
 
-import { Box, ModalOverlay, Modal, useDisclosure } from '@chakra-ui/react'
+import { Box, ModalOverlay, useDisclosure, Modal } from '@chakra-ui/react'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
 import ModalContent from 'src/components/Modal'
+import Table from 'src/components/Table'
 import { api } from 'src/services/api'
-import useSWR from 'swr'
 
-import Table from '../components/Table'
-
-const Dashboard: React.FC = ({
-  numberOfOrders
+const Query: React.FC = ({
+  orders
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [checked, setChecked] = useState(new Array(numberOfOrders).fill(false))
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const { data, error } = useSWR(
-    '/api/getOrders',
-    async url => {
-      const response = await api.get(url)
-
-      if (response.data) {
-        const newLength = response.data.length - numberOfOrders
-
-        for (let i = 0; i < newLength; i++) {
-          setChecked([...checked, false])
-        }
-      }
-
-      return response.data.reverse()
-    },
-    {
-      revalidateOnFocus: true,
-      revalidateOnMount: true
-    }
-  )
+  const [checked, setChecked] = useState(new Array(orders.length).fill(false))
 
   return (
     <Box
@@ -59,13 +36,11 @@ const Dashboard: React.FC = ({
         <ModalContent onClose={onClose} checkedFields={checked} />
       </Modal>
       <ButtonGroup
-        checkedFields={checked}
-        printData={data}
         openModal={onOpen}
+        printData={orders}
+        checkedFields={checked}
       />
-      {!data && <Table rows={[]} checked={checked} setChecked={setChecked} />}
-      {!data && !error && <p>carregando dados...</p>}
-      {data && <Table rows={data} checked={checked} setChecked={setChecked} />}
+      <Table rows={orders} checked={checked} setChecked={setChecked} />
     </Box>
   )
 }
@@ -73,7 +48,11 @@ const Dashboard: React.FC = ({
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  let accessToken: string = token
+  let accessToken
+
+  if (token) {
+    accessToken = token
+  }
 
   if (!token && JID) {
     const response = await api.get('/api/refreshToken', {
@@ -89,10 +68,6 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
       })
 
       accessToken = response.data.accessToken
-
-      return {
-        props: {}
-      }
     }
   }
 
@@ -105,20 +80,25 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     }
   }
 
-  const numberOfOrders = await api({
+  const { query } = ctx
+
+  const response = await api({
     method: 'GET',
-    url: '/order/count',
+    params: query,
+    url: '/order',
     baseURL: 'http://localhost:3333',
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   })
 
+  const orders = response.data.reverse()
+
   return {
     props: {
-      numberOfOrders: numberOfOrders.data.quantity
+      orders
     }
   }
 }
 
-export default Dashboard
+export default Query

@@ -1,31 +1,34 @@
-import React, { useState } from 'react'
-import { Plus } from 'react-feather'
+import React, { useEffect, useState } from 'react'
+import { X } from 'react-feather'
 import { Control, FormState, UseFormRegister } from 'react-hook-form'
-import { OptionTypeBase } from 'react-select'
+import MaskInput from 'react-input-mask'
 
 import {
   InputGroup,
   InputLeftElement,
   Stack,
   Input as ChakraInput,
-  Button,
   Flex,
-  Icon,
   FormControl,
-  FormErrorMessage
+  FormErrorMessage,
+  Button,
+  Icon
 } from '@chakra-ui/react'
 import ChakraReactSelect from 'src/components/ChakraReactSelect'
-import FileUpload from 'src/components/FileUpload'
+import { IOrder } from 'src/pages/order/[id]'
 
 import { UseFormType } from '../../@types/pedidos'
 import Input from '../components/FormInput'
 
 interface IFieldsContainer {
+  defaultValues?: IOrder
   register: UseFormRegister<UseFormType>
+  handleRemove?: (index: number) => void
   formState: FormState<UseFormType>
   border?: boolean
   index: number
-  withImages?: boolean
+  disabled?: boolean
+  phoneWatch: string
   /* eslint-disable */
   control?: Control<UseFormType, object>
   /* eslint-enable */
@@ -33,110 +36,176 @@ interface IFieldsContainer {
 
 const FieldsContainer: React.FC<IFieldsContainer> = ({
   register,
+  defaultValues,
   formState,
   border = false,
+  disabled = false,
+  phoneWatch,
   index,
-  withImages = false,
-  control
+  control,
+  handleRemove,
+  children
 }) => {
   const { errors } = formState
 
-  const options: OptionTypeBase[] = [
-    { value: 'camila', label: 'Camila' },
-    { value: 'carlos', label: 'Carlos' },
-    { value: 'thiago', label: 'Thiago' }
+  let initialPhoneMask = '(99) 9999-9999?'
+
+  if (defaultValues?.phone) {
+    if (defaultValues.phone.length > 14) {
+      initialPhoneMask = '(99) 99999-9999'
+    } else {
+      initialPhoneMask = '(99) 9999-99999'
+    }
+  }
+  const [maskValue, setMaskValue] = useState(initialPhoneMask)
+
+  useEffect(() => {
+    if (phoneWatch?.length > 14) {
+      setMaskValue('(99) 99999-9999')
+    } else {
+      setMaskValue('(99) 9999-99999')
+    }
+  }, [phoneWatch])
+
+  const vendorOptions = [
+    { label: 'Camila', value: 'Camila' },
+    { label: 'Jéssica', value: 'Jessica' },
+    { label: 'Renata', value: 'Renata' },
+    { label: 'Laildon', value: 'Laildon' },
+    { label: 'Dougllas', value: 'Dougllas' }
   ]
 
-  const [stateOptions, setOptions] = useState(options)
+  const descOptions = [
+    { label: 'Kit bandeira 2 metros', value: 'Kit bandeira 2 metros' },
+    { label: 'Kit bandeira 3 metros', value: 'Kit bandeira 3 metros' }
+  ]
 
-  const handleCreate = (inputValue: string) => {
-    function capitalizeFirstLetter(value: string) {
-      const lowerCase = value.toLowerCase()
-      return lowerCase.charAt(0).toUpperCase() + lowerCase.slice(1)
-    }
+  const titleOptions = [
+    { label: 'Kit Grande', value: 'Kit Grande' },
+    { label: 'Kit Pequeno', value: 'Kit Pequeno' }
+  ]
 
-    const newOption = {
-      label: capitalizeFirstLetter(inputValue),
-      value: inputValue.toLowerCase().replace(/\W/g, '-')
-    }
+  const deliveryOptions = [
+    { label: 'Motoboy', value: 'Motoboy' },
+    { label: 'Transportadora', value: 'Transportadora' },
+    { label: 'Retirar', value: 'Retirar' },
+    { label: 'Correio', value: 'Correio' }
+  ]
 
-    setOptions([...stateOptions, newOption])
-  }
-
-  function validateFiles(value: FileList) {
-    if (value.length < 1) {
-      return 'Files is required'
-    }
-    for (const file of Array.from(value)) {
-      const fsMb = file.size / (1024 * 1024)
-      const MAX_FILE_SIZE = 10
-      if (fsMb > MAX_FILE_SIZE) {
-        return 'Max file size 10mb'
-      }
-    }
-    return true
-  }
+  const paymentOptions = [
+    { label: 'Dinheiro', value: 'Dinheiro' },
+    { label: 'Crédito', value: 'Credito' },
+    { label: 'Débito', value: 'Debito' },
+    { label: 'Pix', value: 'Pix' },
+    { label: 'Transferência bancária', value: 'Transferencia bancaria' }
+  ]
 
   return (
     <FormControl
+      disabled={disabled}
+      opacity={disabled ? 0.8 : 1}
+      cursor={disabled ? 'not-allowed' : 'default'}
       as="fieldset"
       form="newForm"
-      isInvalid={!!errors?.pedidos?.[index]?.file_}
-      isRequired={withImages}
       borderBottomWidth={border ? 'thin' : 'none'}
+      marginBottom={border ? '4' : 0}
       borderColor="#dfdfdf"
-      pb="4"
+      pb="6"
     >
       <Stack spacing="5" width={['full', 'xl', 'xl', '2xl', '4xl']}>
-        <Input
-          placeholder="Código"
-          width="2xs"
-          {...register(`pedidos.${index}.code`, {
-            maxLength: 4
-          })}
-        />
+        <Flex
+          flexDirection="row"
+          w="full"
+          justifyContent="flex-end"
+          position="absolute"
+          alignItems="center"
+        >
+          {handleRemove && (
+            <Button
+              onClick={() => handleRemove(index)}
+              background="unset"
+              width="min-content"
+              height="min-content"
+              _hover={{
+                opacity: 0.8,
+                background: 'none'
+              }}
+            >
+              <Icon as={X} />
+            </Button>
+          )}
+        </Flex>
         <Flex flexDirection={['column', 'row']}>
           <Input
+            defaultValue={defaultValues?.customerName}
+            cursor={disabled ? 'not-allowed' : 'default'}
             placeholder="Nome do cliente"
             width={['full', '8xl']}
             mr={['0', '6']}
             mb={['5', '0']}
             {...register(`pedidos.${index}.customerName`, {
-              maxLength: 250
+              maxLength: 250,
+              required: false
             })}
           />
           <Input
-            placeholder="Telefone"
+            defaultValue={defaultValues?.phone}
+            cursor={disabled ? 'not-allowed' : 'default'}
+            placeholder="(00) 00000-0000"
             type="tel"
+            as={MaskInput}
+            mask={maskValue}
+            maskChar=""
             width="full"
             {...register(`pedidos.${index}.phone`, {
               minLength: 10,
-              maxLength: 11
+              maxLength: 15,
+              required: false,
+              pattern: /(\(?\d{2}\)?\s)?(\d{4,5}-\d{4})/g
             })}
           />
         </Flex>
         <Input
+          defaultValue={defaultValues?.address}
+          cursor={disabled ? 'not-allowed' : 'default'}
           placeholder="Endereço"
           {...register(`pedidos.${index}.address`, {
-            maxLength: 250
+            maxLength: 250,
+            required: false
           })}
         />
+        <Flex alignItems="center" flexDirection={['column', 'row']}>
+          <ChakraReactSelect
+            mr={['0', '6']}
+            control={control}
+            placeholder="Vendedor"
+            defaultValue={defaultValues?.vendor}
+            defaultOptions={vendorOptions}
+            {...register(`pedidos.${index}.vendor`, {
+              maxLength: 250,
+              required: false
+            })}
+          />
+          <ChakraReactSelect
+            control={control}
+            placeholder="Descrição"
+            width={['full', '5xl']}
+            defaultOptions={descOptions}
+            defaultValue={defaultValues?.description}
+            {...register(`pedidos.${index}.description`, {
+              maxLength: 250,
+              required: false
+            })}
+          />
+        </Flex>
         <ChakraReactSelect
+          defaultValue={defaultValues?.delivery}
+          defaultOptions={deliveryOptions}
           control={control}
-          placeholder="Vendedor"
-          onCreateEvent={handleCreate}
-          options={stateOptions}
           width="2xs"
-          {...register(`pedidos.${index}.vendor`, {
-            maxLength: 250
-          })}
-        />
-        <ChakraReactSelect
-          control={control}
-          placeholder="Descrição"
-          onCreateEvent={handleCreate}
-          options={stateOptions}
-          {...register(`pedidos.${index}.description`, {
+          placeholder="Forma de entrega"
+          {...register(`pedidos.${index}.delivery`, {
+            required: false,
             maxLength: 250
           })}
         />
@@ -146,6 +215,8 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               R$
             </InputLeftElement>
             <ChakraInput
+              defaultValue={defaultValues?.total}
+              cursor={disabled ? 'not-allowed' : 'default'}
               placeholder="Valor"
               mb={['5', '0']}
               variant="flushed"
@@ -160,55 +231,37 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               _focus={{
                 shadow: 0
               }}
-              {...register(`pedidos.${index}.value`)}
+              {...register(`pedidos.${index}.total`, {
+                required: false,
+                valueAsNumber: true
+              })}
             />
           </InputGroup>
           <ChakraReactSelect
+            defaultValue={defaultValues?.payment}
             control={control}
+            defaultOptions={paymentOptions}
             width={['full', '5xl']}
             placeholder="Forma de pagamento"
-            onCreateEvent={handleCreate}
-            options={stateOptions}
-            {...register(`pedidos.${index}.payment`)}
+            {...register(`pedidos.${index}.payment`, {
+              required: false,
+              maxLength: 250
+            })}
           />
         </Flex>
         <ChakraReactSelect
+          defaultValue={defaultValues?.title}
+          defaultOptions={titleOptions}
           control={control}
           width="2xs"
-          placeholder="Forma de entrega"
-          onCreateEvent={handleCreate}
-          options={stateOptions}
-          {...register(`pedidos.${index}.delivery`)}
+          placeholder="Título"
+          {...register(`pedidos.${index}.title`, {
+            required: false,
+            maxLength: 250
+          })}
         />
-        {withImages && (
-          <FileUpload
-            accept="image/*"
-            register={register(`pedidos.${index}.file_`, {
-              validate: validateFiles
-            })}
-            multiple
-          >
-            <Button
-              bg="#dfdede"
-              w="36"
-              h="24"
-              _focus={{
-                boxShadow: 'none',
-                outline: 0,
-                border: 0
-              }}
-              _hover={{
-                backgroundColor: '#c2c2c2'
-              }}
-            >
-              <Icon as={Plus} boxSize="8" />
-            </Button>
-          </FileUpload>
-        )}
-        <FormErrorMessage>
-          {errors?.pedidos?.[index]?.file_ &&
-            errors?.pedidos?.[index]?.file_?.message}
-        </FormErrorMessage>
+        {children}
+        <FormErrorMessage>{errors?.pedidos?.[index]?.message}</FormErrorMessage>
       </Stack>
     </FormControl>
   )

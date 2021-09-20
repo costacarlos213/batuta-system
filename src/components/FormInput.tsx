@@ -2,10 +2,14 @@ import React from 'react'
 
 import { Input, InputProps } from '@chakra-ui/react'
 
-const FormInput: React.FC<InputProps> = ({ ...rest }) => {
+interface IFormInput extends InputProps {
+  mask?: string
+  maskChar?: string
+}
+
+const FormInput: React.FC<IFormInput> = ({ ...rest }) => {
   return (
     <Input
-      type="text"
       variant="flushed"
       _placeholder={{
         color: 'gray.200'

@@ -1,16 +1,36 @@
-type FormValues = {
-  code: string
+interface FormValues {
+  cod: string
   file_: FileList
   delivery: string
   customerName: string
   phone: string
   vendor: string
-  value: string
+  total: number
   payment: string
   address: string
   description: string
+  vendor: string
+  initialDate: string
+  finalDate: string
+  comments: string
+  color: 'green' | 'yellow'
+  title: string
 }
 
-export type UseFormType = {
+export interface UseFormType {
   pedidos: FormValues[]
+}
+
+export interface ISearchForm {
+  cod: string
+  address: string
+  customerName: string
+  delivery: string
+  description: string
+  payment: string
+  phone: string
+  total: number
+  vendor: string
+  initialDate: string
+  finalDate: string
 }

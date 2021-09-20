@@ -9,13 +9,14 @@ const Navbar: React.FC<FlexProps> = props => {
   return (
     <Flex
       bg="white"
+      zIndex="99"
       position="relative"
       shadow="md"
       flexDirection="row"
       alignItems="center"
       justifyContent="space-between"
       h="max-content"
-      py={['5', '5', '5', '5', '7']}
+      py={['5', '5', '5', '5', '5']}
       px={['6', '6', '6', '6', '8']}
       {...props}
     >
@@ -23,14 +24,11 @@ const Navbar: React.FC<FlexProps> = props => {
         <MenuItem
           to="/dashboard"
           fontWeight="bold"
-          fontSize={['2xl', '2xl', '2xl', '2xl', '4xl']}
+          fontSize={['xl', 'xl', 'xl', 'xl', '2xl', '4xl']}
         >
           Dashboard
         </MenuItem>
-        <MenuItem to="/print" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
-          Relatório
-        </MenuItem>
-        <MenuItem to="/search" fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}>
+        <MenuItem to="/search" fontSize={['md', 'md', 'md', 'md', 'xl', '2xl']}>
           Pesquisar
         </MenuItem>
       </HStack>
@@ -38,7 +36,7 @@ const Navbar: React.FC<FlexProps> = props => {
         <MenuItem
           to="/new"
           fontWeight="medium"
-          fontSize={['xl', 'xl', 'xl', 'xl', '3xl']}
+          fontSize={['md', 'md', 'md', 'md', 'xl', '2xl']}
           color="green.400"
         >
           <span>

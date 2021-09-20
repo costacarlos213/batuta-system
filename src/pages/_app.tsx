@@ -5,6 +5,7 @@ import { Global } from '@emotion/react'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import Layout from 'src/components/Layout'
+import { AuthProvider } from 'src/context/AuthContext'
 
 import theme, { scrollBarStyles } from '../styles/globals'
 
@@ -21,22 +22,26 @@ const MyApp = ({
   pageProps,
   router
 }: AppPropsWithLayout): ReactNode => {
-  if (router.pathname === '/') {
+  if (router.pathname === '/' || router.pathname === '/simple') {
     return (
-      <ChakraProvider resetCSS theme={theme}>
-        <Global styles={scrollBarStyles} />
-        <Component {...pageProps} />
-      </ChakraProvider>
+      <AuthProvider>
+        <ChakraProvider resetCSS theme={theme}>
+          <Global styles={scrollBarStyles} />
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </AuthProvider>
     )
   }
 
   return (
-    <ChakraProvider resetCSS theme={theme}>
-      <Global styles={scrollBarStyles} />
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </ChakraProvider>
+    <AuthProvider>
+      <ChakraProvider resetCSS theme={theme}>
+        <Global styles={scrollBarStyles} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ChakraProvider>
+    </AuthProvider>
   )
 }
 
