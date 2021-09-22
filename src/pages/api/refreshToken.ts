@@ -8,7 +8,7 @@ const RefreshToken = async (
   const { headers } = req
   try {
     const { data, headers: returnedHeaders } = await api.get(
-      'http://localhost:3333/token',
+      'http://3.84.17.159:3333/token',
       {
         headers
       }

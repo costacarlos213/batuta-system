@@ -53,8 +53,6 @@ const DashboardTable: React.FC<ITableContent> = ({
     })
 
     setChecked(updatedCheckedState)
-
-    console.log(updatedCheckedState)
   }
 
   return (

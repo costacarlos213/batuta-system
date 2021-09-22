@@ -70,7 +70,8 @@ const Order: React.FC = ({
             comments: order.comments,
             vendor: order.vendor,
             color: order.color,
-            title: order.title
+            title: order.title,
+            initialDate: order.date
           }
         ]
       }
@@ -143,6 +144,11 @@ const Order: React.FC = ({
           }
 
           apiData.append('deletedFiles', JSON.stringify(deletedFiles))
+        } else if (key === 'phone') {
+          apiData.append(
+            'phone',
+            (formData as any)[key].toString().replace(/\D+/g, '')
+          )
         } else {
           apiData.append(key, (formData as any)[key].toString())
         }
@@ -150,7 +156,7 @@ const Order: React.FC = ({
     })
 
     api
-      .put('http://localhost:3333/order', apiData)
+      .put('http://3.84.17.159:3333/order', apiData)
       .then(response => {
         console.log(response.data)
       })
@@ -230,6 +236,15 @@ const Order: React.FC = ({
           width="2xs"
           control={control}
           {...register('pedidos.0.color')}
+        />
+        <Input
+          placeholder="Data inicial"
+          mr={['0', '6']}
+          type="date"
+          mb={['5', '0']}
+          defaultValue={order.date.split('T')[0]}
+          width="2xs"
+          {...register('pedidos.0.initialDate')}
         />
         <Textarea
           placeholder="Observações"
@@ -349,7 +364,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
         id: params?.id
       },
       url: '/order',
-      baseURL: 'http://localhost:3333',
+      baseURL: 'http://3.84.17.159:3333',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }

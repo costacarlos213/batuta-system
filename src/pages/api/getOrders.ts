@@ -7,7 +7,7 @@ const GetOrders = async (
 ): Promise<void | NextApiResponse> => {
   const { headers } = req
   try {
-    const response = await api.get('http://localhost:3333/order', {
+    const response = await api.get('http://3.84.17.159:3333/order', {
       headers
     })
 

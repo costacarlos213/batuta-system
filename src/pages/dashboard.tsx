@@ -108,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   const numberOfOrders = await api({
     method: 'GET',
     url: '/order/count',
-    baseURL: 'http://localhost:3333',
+    baseURL: 'http://3.84.17.159:3333',
     headers: {
       Authorization: `Bearer ${accessToken}`
     }

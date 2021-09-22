@@ -9,7 +9,7 @@ const Login = async (
   const { headers, body } = req
   try {
     const response = await axios.post(
-      'http://localhost:3333/auth/login',
+      'http://3.84.17.159:3333/auth/login',
       body,
       {
         headers

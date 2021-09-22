@@ -7,7 +7,7 @@ const DeleteOrders = async (
 ): Promise<void | NextApiResponse> => {
   const { headers, body } = req
   try {
-    const response = await api.delete('http://localhost:3333/order', {
+    const response = await api.delete('http://3.84.17.159:3333/order', {
       headers,
       data: body
     })
@@ -18,8 +18,6 @@ const DeleteOrders = async (
     return res.status(response.status).send(response.data)
   } catch (error) {
     const response = error?.response
-
-    console.log(response)
 
     if (response.config.__isRetryRequest) {
       return res.redirect('/')

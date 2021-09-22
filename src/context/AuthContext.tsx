@@ -1,8 +1,10 @@
 import React, { createContext, useState } from 'react'
 
+import axios from 'axios'
 import { useRouter } from 'next/router'
 import { setCookie } from 'nookies'
-import { api } from 'src/services/api'
+
+import { api } from '../services/api'
 
 type LoginDataType = {
   email: string
@@ -22,33 +24,33 @@ export const AuthProvider: React.FC = ({ children }) => {
   const router = useRouter()
 
   async function signIn({ email, password }: LoginDataType) {
-    const response = await api.post(
-      '/api/login',
-      { email, password },
-      {
-        headers: { 'Content-Type': 'application/json' }
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/api/login',
+        { email, password },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+      const { accessToken } = response.data
+
+      setCookie(undefined, 'dashboard.access-token', accessToken, {
+        maxAge: 60 * 15,
+        path: '/'
+      })
+
+      setIsAuthenticated(true)
+
+      api.defaults.headers.Authorization = `Bearer ${accessToken}`
+
+      router.push('/dashboard')
+    } catch (error) {
+      if (error?.response.status === 401) {
+        setIsAuthenticated(false)
+      } else {
+        console.log(error?.response.data)
       }
-    )
-
-    console.log(response.status)
-
-    if (response.status !== 200) {
-      setIsAuthenticated(false)
-      return
     }
-
-    const { accessToken } = response.data
-
-    setCookie(undefined, 'dashboard.access-token', accessToken, {
-      maxAge: 60 * 15,
-      path: '/'
-    })
-
-    setIsAuthenticated(true)
-
-    api.defaults.headers.Authorization = `Bearer ${accessToken}`
-
-    router.push('/dashboard')
   }
 
   return (

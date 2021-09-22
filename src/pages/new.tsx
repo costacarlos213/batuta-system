@@ -58,7 +58,6 @@ const New: React.FC = () => {
 
   const onSubmit = handleSubmit(async data => {
     setDisabled(true)
-    console.log(data)
 
     let index = 0
 
@@ -85,9 +84,8 @@ const New: React.FC = () => {
     })
 
     api
-      .post('http://localhost:3333/order', formData)
-      .then(response => {
-        console.log(response.data)
+      .post('http://3.84.17.159:3333/order', formData)
+      .then(() => {
         router.push('/dashboard')
       })
       .catch(error => {

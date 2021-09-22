@@ -2,7 +2,7 @@ import React from 'react'
 import { Search as SearchIcon } from 'react-feather'
 import { useForm } from 'react-hook-form'
 
-import { Box, Button, Flex, Heading, Icon } from '@chakra-ui/react'
+import { Box, Button, Heading, Icon, Stack, Text } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { parseCookies, setCookie } from 'nookies'
@@ -96,7 +96,7 @@ const Search: React.FC = () => {
         <Input
           cursor={'not-allowed'}
           placeholder="Código"
-          width="2xs"
+          width={['full', '2xs']}
           mb="-6"
           {...register('pedidos.0.cod', {
             maxLength: 4,
@@ -112,22 +112,26 @@ const Search: React.FC = () => {
           formState={formState}
           border={false}
         >
-          <Flex flexDirection={['column', 'row']}>
+          <Stack
+            direction={['column', 'row']}
+            alignItems={['center', 'flex-end']}
+            spacing={['2', '5']}
+            justifyContent={['center', 'flex-start']}
+          >
             <Input
               placeholder="Data inicial"
-              mr={['0', '6']}
               type="date"
-              mb={['5', '0']}
-              width="2xs"
+              width={['full', '2xs']}
               {...register('pedidos.0.initialDate')}
             />
+            <Text>Até</Text>
             <Input
               placeholder="Data Final"
               type="date"
-              width="2xs"
+              width={['full', '2xs']}
               {...register('pedidos.0.finalDate')}
             />
-          </Flex>
+          </Stack>
         </FieldsContainer>
         <Button
           mb="6"

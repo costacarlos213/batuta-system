@@ -9,7 +9,7 @@ const Print = async (
 
   try {
     const response = await api.post(
-      'http://localhost:3333/print',
+      'http://3.84.17.159:3333/print',
       {
         printArray: body
       },

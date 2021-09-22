@@ -86,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     method: 'GET',
     params: query,
     url: '/order',
-    baseURL: 'http://localhost:3333',
+    baseURL: 'http://3.84.17.159:3333',
     headers: {
       Authorization: `Bearer ${accessToken}`
     }

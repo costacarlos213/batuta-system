@@ -54,8 +54,6 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleImageClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    console.log('CLICKED')
-
     if (inputRef.current) {
       const [, fileName] = e.currentTarget.id.split('$')
       const storedFiles = files

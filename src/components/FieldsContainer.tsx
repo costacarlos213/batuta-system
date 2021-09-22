@@ -97,7 +97,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
     { label: 'Crédito', value: 'Credito' },
     { label: 'Débito', value: 'Debito' },
     { label: 'Pix', value: 'Pix' },
-    { label: 'Transferência bancária', value: 'Transferencia bancaria' }
+    { label: 'Transferência', value: 'Transferencia' }
   ]
 
   return (
@@ -174,7 +174,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
             required: false
           })}
         />
-        <Flex alignItems="center" flexDirection={['column', 'row']}>
+        <Stack alignItems="center" direction={['column', 'row']} spacing="5">
           <ChakraReactSelect
             mr={['0', '6']}
             control={control}
@@ -197,12 +197,12 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               required: false
             })}
           />
-        </Flex>
+        </Stack>
         <ChakraReactSelect
           defaultValue={defaultValues?.delivery}
           defaultOptions={deliveryOptions}
           control={control}
-          width="2xs"
+          width={['full', '2xs']}
           placeholder="Forma de entrega"
           {...register(`pedidos.${index}.delivery`, {
             required: false,
@@ -253,7 +253,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           defaultValue={defaultValues?.title}
           defaultOptions={titleOptions}
           control={control}
-          width="2xs"
+          width={['full', '2xs']}
           placeholder="Título"
           {...register(`pedidos.${index}.title`, {
             required: false,

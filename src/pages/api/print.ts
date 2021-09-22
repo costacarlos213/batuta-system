@@ -8,7 +8,7 @@ const Print = async (
   const { headers, body } = req
 
   try {
-    const response = await api.post('http://localhost:3333/print', body, {
+    const response = await api.post('http://3.84.17.159:3333/print', body, {
       responseType: 'arraybuffer',
       headers
     })
