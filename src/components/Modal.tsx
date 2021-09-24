@@ -13,10 +13,11 @@ import {
   Stack
 } from '@chakra-ui/react'
 import { useRouter } from 'next/dist/client/router'
+import { IOrder } from 'src/pages/order/[id]'
 import { api } from 'src/services/api'
 
 interface IModalFunctions {
-  checkedFields?: ({ id: string } | boolean)[]
+  checkedFields?: (IOrder | boolean)[]
   onClose: () => void
 }
 
@@ -30,17 +31,28 @@ const ModalContent: React.FC<IModalFunctions> = ({
   const handleMultipleDelete = () => {
     setIsLoading(true)
 
-    const filteredIds = checkedFields?.filter(item => typeof item !== 'boolean')
+    const filteredIds: IOrder[] = checkedFields?.filter(
+      item => typeof item !== 'boolean'
+    ) as IOrder[]
+    const onlyIds = filteredIds?.map(order => {
+      return { id: order.id }
+    })
 
     api
       .delete('/api/deleteOrders', {
-        data: filteredIds
+        data: onlyIds
       })
       .then(() => {
         onClose()
         router.reload()
       })
-      .catch(error => console.log(error))
+      .catch(err => {
+        if (err?.response?.status === 401) {
+          router.push('/')
+        } else {
+          console.log(err)
+        }
+      })
       .finally(() => {
         setIsLoading(false)
       })

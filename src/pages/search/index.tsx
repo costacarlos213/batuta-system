@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Box, Button, Heading, Icon, Stack, Text } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
-import { parseCookies, setCookie } from 'nookies'
+import { parseCookies } from 'nookies'
 import { api } from 'src/services/api'
 
 import { ISearchForm, UseFormType } from '../../../@types/pedidos'
@@ -96,8 +96,11 @@ const Search: React.FC = () => {
         <Input
           cursor={'not-allowed'}
           placeholder="Código"
-          width={['full', '2xs']}
-          mb="-6"
+          _disabled={{
+            color: 'gray.200'
+          }}
+          width={['full', 'sm']}
+          mb="4"
           {...register('pedidos.0.cod', {
             maxLength: 4,
             required: false,
@@ -136,12 +139,13 @@ const Search: React.FC = () => {
         <Button
           mb="6"
           type="submit"
-          bg="transparent"
-          p="0"
-          mr="3"
-          color="whatsapp.500"
+          fontWeight="semibold"
+          fontSize="md"
+          backgroundColor="whatsapp.500"
+          px="5"
+          color="white"
           _hover={{
-            color: 'green.400'
+            backgroundColor: 'whatsapp.400'
           }}
         >
           <Icon as={SearchIcon} strokeWidth="3" mr="2" />
@@ -155,26 +159,11 @@ const Search: React.FC = () => {
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
-      headers: {
-        Cookie: `JID=${JID}`
-      }
-    })
+  const bearer = `Bearer ${token}`
 
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15,
-        path: '/'
-      })
+  api.defaults.headers.common.Authorization = bearer
 
-      return {
-        props: {}
-      }
-    }
-  }
-
-  if (!token) {
+  if (!JID) {
     return {
       redirect: {
         destination: '/',

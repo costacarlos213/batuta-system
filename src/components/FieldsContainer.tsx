@@ -12,13 +12,15 @@ import {
   FormControl,
   FormErrorMessage,
   Button,
-  Icon
+  Icon,
+  Text
 } from '@chakra-ui/react'
 import ChakraReactSelect from 'src/components/ChakraReactSelect'
 import { IOrder } from 'src/pages/order/[id]'
 
 import { UseFormType } from '../../@types/pedidos'
 import Input from '../components/FormInput'
+import RadioOptions from './RadioOptions'
 
 interface IFieldsContainer {
   defaultValues?: IOrder
@@ -29,6 +31,7 @@ interface IFieldsContainer {
   index: number
   disabled?: boolean
   phoneWatch: string
+  titleWatch?: string
   /* eslint-disable */
   control?: Control<UseFormType, object>
   /* eslint-enable */
@@ -41,6 +44,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
   border = false,
   disabled = false,
   phoneWatch,
+  titleWatch,
   index,
   control,
   handleRemove,
@@ -106,12 +110,25 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
       opacity={disabled ? 0.8 : 1}
       cursor={disabled ? 'not-allowed' : 'default'}
       as="fieldset"
+      w="full"
       form="newForm"
       borderBottomWidth={border ? 'thin' : 'none'}
       marginBottom={border ? '4' : 0}
       borderColor="#dfdfdf"
       pb="6"
     >
+      <ChakraReactSelect
+        mr={['0', '6']}
+        control={control}
+        width={['full', 'sm']}
+        placeholder="Vendedor"
+        defaultValue={defaultValues?.vendor}
+        defaultOptions={vendorOptions}
+        {...register(`pedidos.${index}.vendor`, {
+          maxLength: 250,
+          required: false
+        })}
+      />
       <Stack spacing="5" width={['full', 'xl', 'xl', '2xl', '4xl']}>
         <Flex
           flexDirection="row"
@@ -135,12 +152,16 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
             </Button>
           )}
         </Flex>
-        <Flex flexDirection={['column', 'row']}>
+        <Stack
+          alignItems="center"
+          direction={['column', 'row']}
+          spacing={['0', '10']}
+        >
           <Input
             defaultValue={defaultValues?.customerName}
             cursor={disabled ? 'not-allowed' : 'default'}
             placeholder="Nome do cliente"
-            width={['full', '8xl']}
+            width={['full', '3xl']}
             mr={['0', '6']}
             mb={['5', '0']}
             {...register(`pedidos.${index}.customerName`, {
@@ -164,52 +185,24 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               pattern: /(\(?\d{2}\)?\s)?(\d{4,5}-\d{4})/g
             })}
           />
-        </Flex>
-        <Input
-          defaultValue={defaultValues?.address}
-          cursor={disabled ? 'not-allowed' : 'default'}
-          placeholder="Endereço"
-          {...register(`pedidos.${index}.address`, {
+        </Stack>
+        <ChakraReactSelect
+          control={control}
+          placeholder="Descrição do produto"
+          width={['full', '3xl']}
+          defaultOptions={descOptions}
+          defaultValue={defaultValues?.description}
+          {...register(`pedidos.${index}.description`, {
             maxLength: 250,
             required: false
           })}
         />
-        <Stack alignItems="center" direction={['column', 'row']} spacing="5">
-          <ChakraReactSelect
-            mr={['0', '6']}
-            control={control}
-            placeholder="Vendedor"
-            defaultValue={defaultValues?.vendor}
-            defaultOptions={vendorOptions}
-            {...register(`pedidos.${index}.vendor`, {
-              maxLength: 250,
-              required: false
-            })}
-          />
-          <ChakraReactSelect
-            control={control}
-            placeholder="Descrição"
-            width={['full', '5xl']}
-            defaultOptions={descOptions}
-            defaultValue={defaultValues?.description}
-            {...register(`pedidos.${index}.description`, {
-              maxLength: 250,
-              required: false
-            })}
-          />
-        </Stack>
-        <ChakraReactSelect
-          defaultValue={defaultValues?.delivery}
-          defaultOptions={deliveryOptions}
-          control={control}
-          width={['full', '2xs']}
-          placeholder="Forma de entrega"
-          {...register(`pedidos.${index}.delivery`, {
-            required: false,
-            maxLength: 250
-          })}
-        />
-        <Flex alignItems="center" flexDirection={['column', 'row']}>
+
+        <Stack
+          alignItems="center"
+          direction={['column', 'row']}
+          spacing={['0', '10']}
+        >
           <InputGroup mr={['0', '6']}>
             <InputLeftElement pointerEvents="none" color="gray.200">
               R$
@@ -248,14 +241,42 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               maxLength: 250
             })}
           />
-        </Flex>
+        </Stack>
         <ChakraReactSelect
           defaultValue={defaultValues?.title}
           defaultOptions={titleOptions}
           control={control}
-          width={['full', '2xs']}
-          placeholder="Título"
+          width={['full', 'sm']}
+          placeholder="Resumo do pedido"
           {...register(`pedidos.${index}.title`, {
+            required: false,
+            maxLength: 250
+          })}
+        />
+        <Text fontSize="md">Selecione a cor destaque do pedido</Text>
+        <RadioOptions
+          defaultValue={defaultValues?.color}
+          titleWatch={titleWatch || ''}
+          width="2xs"
+          control={control}
+          {...register(`pedidos.${index}.color`)}
+        />
+        <Input
+          defaultValue={defaultValues?.address}
+          cursor={disabled ? 'not-allowed' : 'default'}
+          placeholder="Endereço"
+          {...register(`pedidos.${index}.address`, {
+            maxLength: 250,
+            required: false
+          })}
+        />
+        <ChakraReactSelect
+          defaultValue={defaultValues?.delivery}
+          defaultOptions={deliveryOptions}
+          control={control}
+          width={['full', 'sm']}
+          placeholder="Forma de entrega"
+          {...register(`pedidos.${index}.delivery`, {
             required: false,
             maxLength: 250
           })}

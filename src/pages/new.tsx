@@ -12,8 +12,8 @@ import {
   Textarea
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { useRouter } from 'next/dist/client/router'
-import { parseCookies, setCookie } from 'nookies'
+import { useRouter } from 'next/router'
+import { parseCookies } from 'nookies'
 import RadioOptions from 'src/components/RadioOptions'
 import { api } from 'src/services/api'
 import { validateFiles } from 'src/utils/validateFiles'
@@ -84,12 +84,16 @@ const New: React.FC = () => {
     })
 
     api
-      .post('http://3.84.17.159:3333/order', formData)
+      .post('/api/newOrder', formData)
       .then(() => {
         router.push('/dashboard')
       })
-      .catch(error => {
-        console.log(error)
+      .catch(err => {
+        if (err?.response?.status === 401) {
+          router.push('/')
+        } else {
+          console.log(err)
+        }
       })
       .finally(() => {
         setDisabled(false)
@@ -140,7 +144,7 @@ const New: React.FC = () => {
         }}
         id="newForm"
       >
-        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="2">
+        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="6">
           Cadastro de pedidos
         </Heading>
 
@@ -151,6 +155,7 @@ const New: React.FC = () => {
           if (fields.length === index + 1) {
             return (
               <FieldsContainer
+                titleWatch={titleWatch}
                 handleRemove={index !== 0 ? removeFormSection : undefined}
                 control={control}
                 disabled={isDisabled}
@@ -161,12 +166,6 @@ const New: React.FC = () => {
                 formState={formState}
                 border={false}
               >
-                <RadioOptions
-                  titleWatch={titleWatch}
-                  width="2xs"
-                  control={control}
-                  {...register(`pedidos.${index}.color`)}
-                />
                 <Textarea
                   placeholder="Observações"
                   resize="none"
@@ -200,6 +199,7 @@ const New: React.FC = () => {
           } else {
             return (
               <FieldsContainer
+                titleWatch={titleWatch}
                 handleRemove={index !== 0 ? removeFormSection : undefined}
                 control={control}
                 disabled={isDisabled}
@@ -210,12 +210,6 @@ const New: React.FC = () => {
                 formState={formState}
                 border
               >
-                <RadioOptions
-                  width="2xs"
-                  control={control}
-                  titleWatch={titleWatch}
-                  {...register(`pedidos.${index}.color`)}
-                />
                 <Textarea
                   placeholder="Observações"
                   resize="none"
@@ -268,14 +262,16 @@ const New: React.FC = () => {
         })}
         <Flex flexDirection="row" alignItems="center">
           <Button
-            mb="6"
             disabled={isDisabled}
             onClick={addNewFormSection}
-            bg="transparent"
-            p="0"
-            mr="5"
+            px="5"
+            mb="6"
+            mr="6"
+            fontWeight="medium"
+            fontSize="md"
+            backgroundColor="gray.100"
             _hover={{
-              color: 'black'
+              backgroundColor: 'gray.300'
             }}
           >
             <Icon as={Plus} mr="1" />
@@ -285,16 +281,17 @@ const New: React.FC = () => {
             mb="6"
             disabled={isDisabled}
             type="submit"
-            bg="transparent"
-            p="0"
-            mr="3"
-            color="whatsapp.500"
+            fontWeight="semibold"
+            fontSize="md"
+            backgroundColor="whatsapp.500"
+            px="5"
+            color="white"
             _hover={{
-              color: 'green.400'
+              backgroundColor: 'whatsapp.400'
             }}
           >
-            <Icon as={Upload} mr="1" />
-            Enviar
+            <Icon as={Upload} mr="2" />
+            Cadastrar Pedido
           </Button>
           <Spinner
             zIndex="9999"
@@ -311,26 +308,11 @@ const New: React.FC = () => {
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
-      headers: {
-        Cookie: `JID=${JID}`
-      }
-    })
+  const bearer = `Bearer ${token}`
 
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15,
-        path: '/'
-      })
+  api.defaults.headers.common.Authorization = bearer
 
-      return {
-        props: {}
-      }
-    }
-  }
-
-  if (!token) {
+  if (!JID) {
     return {
       redirect: {
         destination: '/',

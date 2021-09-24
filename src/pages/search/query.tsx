@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 
 import { Box, ModalOverlay, useDisclosure, Modal } from '@chakra-ui/react'
+import axios from 'axios'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { parseCookies, setCookie } from 'nookies'
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
 import ModalContent from 'src/components/Modal'
 import Table from 'src/components/Table'
@@ -48,57 +49,85 @@ const Query: React.FC = ({
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  let accessToken
+  const bearer = `Bearer ${token}`
 
-  if (token) {
-    accessToken = token
-  }
+  api.defaults.headers.common.Authorization = bearer
 
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
-      headers: {
-        Cookie: `JID=${JID}`
-      }
-    })
-
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15,
-        path: '/'
-      })
-
-      accessToken = response.data.accessToken
-    }
-  }
-
-  if (!accessToken) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false
-      }
-    }
-  }
-
-  const { query } = ctx
-
-  const response = await api({
+  return (await axios({
     method: 'GET',
-    params: query,
+    params: ctx.query,
     url: '/order',
-    baseURL: 'http://3.84.17.159:3333',
+    baseURL: 'http://54.85.180.1:3333',
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${token}`
     }
   })
+    .then(resp => {
+      const orders = resp.data
 
-  const orders = response.data.reverse()
+      return {
+        props: {
+          orders
+        }
+      }
+    })
+    .catch(async error => {
+      if (error.response.status === 401) {
+        try {
+          const response = await axios.get('http://54.85.180.1:3333/token', {
+            headers: {
+              Cookie: `JID=${JID}`
+            }
+          })
 
-  return {
-    props: {
-      orders
-    }
-  }
+          setCookie(
+            { res: ctx.res },
+            'dashboard.access-token',
+            response.data.accessToken,
+            {
+              maxAge: 60 * 15,
+              path: '/'
+            }
+          )
+
+          const newbearer = `Bearer ${response.data.accessToken}`
+
+          api.defaults.headers.common.Authorization = newbearer
+
+          const getOrdersResponse = await axios({
+            method: 'GET',
+            params: ctx.query,
+            url: '/order',
+            baseURL: 'http://54.85.180.1:3333',
+            headers: {
+              Authorization: newbearer
+            }
+          })
+
+          const orders = getOrdersResponse.data
+
+          return {
+            props: {
+              orders
+            }
+          }
+        } catch (error) {
+          destroyCookie({ res: ctx.res }, 'JID', {
+            httpOnly: true,
+            path: '/'
+          })
+
+          return {
+            redirect: {
+              destination: '/',
+              permanent: false
+            }
+          }
+        }
+      }
+      /* eslint-disable */
+    })) as any
+    /* eslint-enable */
 }
 
 export default Query

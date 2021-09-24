@@ -1,24 +1,38 @@
+import axios from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { api } from 'src/services/api'
 
 const RefreshToken = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> => {
   const { headers } = req
+
   try {
-    const { data, headers: returnedHeaders } = await api.get(
-      'http://3.84.17.159:3333/token',
-      {
-        headers
-      }
-    )
+    console.log('api refresh token')
+
+    const {
+      data,
+      headers: returnedHeaders,
+      status
+    } = await axios.get('http://54.85.180.1:3333/token', {
+      headers,
+      withCredentials: true
+    })
+
     Object.keys(returnedHeaders).forEach(key =>
       res.setHeader(key, returnedHeaders[key])
     )
+
+    console.log(`api refresh token return status: ${status}`)
+
     res.status(200).json(data)
   } catch (error) {
-    res.send(error)
+    res.setHeader(
+      'set-cookie',
+      'JID=; Max-Age=-1; Path=/; HttpOnly; SameSite=Lax'
+    )
+
+    res.redirect('/')
   }
 }
 

@@ -14,9 +14,8 @@ import {
   Button
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { parseCookies, setCookie } from 'nookies'
+import { parseCookies } from 'nookies'
 import { AuthContext } from 'src/context/AuthContext'
-import { api } from 'src/services/api'
 
 interface ILoginForm {
   email: string
@@ -146,32 +145,11 @@ function Home(): JSX.Element {
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  if (token) {
+  if (token || JID) {
     return {
       redirect: {
         permanent: false,
         destination: '/dashboard'
-      }
-    }
-  }
-
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
-      headers: {
-        Cookie: `JID=${JID}`
-      }
-    })
-
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15
-      })
-
-      return {
-        redirect: {
-          destination: '/dashboard',
-          permanent: false
-        }
       }
     }
   }

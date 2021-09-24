@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 
 import { Flex, Button, Spinner } from '@chakra-ui/react'
+import { useRouter } from 'next/dist/client/router'
 import { IOrder } from 'src/pages/order/[id]'
 import { api } from 'src/services/api'
 
 interface IButtonGroup {
   printData: IOrder[]
-  checkedFields: ({ id: string } | boolean)[]
+  checkedFields: (IOrder | boolean)[]
   openModal: () => void
 }
 
@@ -17,56 +18,83 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false)
 
+  const router = useRouter()
+
   const handlePrintButton = async () => {
     setIsLoading(true)
-    const response = await api.post(
-      '/api/print',
-      {
-        printArray: printData,
-        type: 'simple'
-      },
-      {
-        responseType: 'arraybuffer',
-        headers: {
-          Accept: 'application/pdf'
+
+    try {
+      const response = await api.post(
+        '/api/print',
+        {
+          printArray: printData,
+          type: 'simple'
+        },
+        {
+          responseType: 'arraybuffer',
+          headers: {
+            Accept: 'application/pdf'
+          }
         }
+      )
+
+      const blob = new Blob([response.data], {
+        type: 'application/pdf'
+      })
+
+      const url = window.URL.createObjectURL(blob)
+
+      setIsLoading(false)
+      window.open(url)
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        router.push('/')
+      } else {
+        console.log(err)
       }
-    )
-
-    const blob = new Blob([response.data], {
-      type: 'application/pdf'
-    })
-
-    const url = window.URL.createObjectURL(blob)
-
-    setIsLoading(false)
-    window.open(url)
+    }
   }
 
   const handleGenerateReportButton = async () => {
     setIsLoading(true)
-    const response = await api.post(
-      '/api/print',
-      {
-        printArray: printData,
-        type: 'full'
-      },
-      {
-        responseType: 'arraybuffer',
-        headers: {
-          Accept: 'application/pdf'
+
+    try {
+      const filteredChecked = checkedFields.filter((item: IOrder | boolean) =>
+        typeof item !== 'boolean' ? item : null
+      )
+
+      console.log(filteredChecked)
+
+      const response = await api.post(
+        '/api/print',
+        {
+          printArray:
+            filteredChecked.length === 0 ? printData : filteredChecked,
+          type: 'full'
+        },
+        {
+          responseType: 'arraybuffer',
+          headers: {
+            Accept: 'application/pdf'
+          }
         }
+      )
+
+      const blob = new Blob([response.data], {
+        type: 'application/pdf'
+      })
+
+      const url = window.URL.createObjectURL(blob)
+      setIsLoading(false)
+
+      window.open(url)
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        router.push('/')
+      } else {
+        console.log(err)
       }
-    )
-
-    const blob = new Blob([response.data], {
-      type: 'application/pdf'
-    })
-
-    const url = window.URL.createObjectURL(blob)
-    setIsLoading(false)
-
-    window.open(url)
+    }
   }
 
   return (
@@ -74,47 +102,46 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
       <Button
         onClick={handlePrintButton}
         disabled={isLoading}
-        bg="transparent"
-        p="0"
-        ml="3"
+        px="5"
         mb="2"
         fontWeight="medium"
-        fontSize="sm"
+        fontSize="md"
+        backgroundColor="gray.100"
         _hover={{
-          color: 'gray.500'
+          backgroundColor: 'gray.300'
         }}
       >
-        Imprimir
+        Imprimir Lista
       </Button>
       <Button
         onClick={handleGenerateReportButton}
         disabled={isLoading}
-        bg="transparent"
-        p="0"
-        ml="5"
+        ml="6"
         mb="2"
         fontWeight="semibold"
-        fontSize="sm"
-        color="whatsapp.500"
+        fontSize="md"
+        backgroundColor="whatsapp.500"
+        px="5"
+        color="white"
         _hover={{
-          color: 'green.400'
+          backgroundColor: 'whatsapp.400'
         }}
       >
         Gerar Relatório
       </Button>
       <Button
         onClick={openModal}
-        bg="transparent"
-        p="0"
+        px="5"
         ml="5"
         mb="2"
         hidden={!checkedFields.find(item => typeof item !== 'boolean')}
         disabled={isLoading}
         fontWeight="semibold"
         fontSize="sm"
-        color="red.300"
+        color="white"
+        backgroundColor="red.500"
         _hover={{
-          color: 'red.400'
+          backgroundColor: 'red.600'
         }}
       >
         Excluir

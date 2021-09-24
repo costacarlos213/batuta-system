@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 
 import { Box, ModalOverlay, Modal, useDisclosure } from '@chakra-ui/react'
+import axios from 'axios'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { parseCookies, setCookie } from 'nookies'
+import router from 'next/router'
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
 import ModalContent from 'src/components/Modal'
 import { api } from 'src/services/api'
@@ -19,21 +21,25 @@ const Dashboard: React.FC = ({
   const { data, error } = useSWR(
     '/api/getOrders',
     async url => {
-      const response = await api.get(url)
+      try {
+        const response = await api.get(url)
 
-      if (response.data) {
-        const newLength = response.data.length - numberOfOrders
+        if (response.data) {
+          const newLength = response.data.length - numberOfOrders
 
-        for (let i = 0; i < newLength; i++) {
-          setChecked([...checked, false])
+          for (let i = 0; i < newLength; i++) {
+            setChecked([...checked, false])
+          }
         }
-      }
 
-      return response.data.reverse()
+        return response.data
+      } catch (error) {
+        router.push('/')
+      }
     },
     {
-      revalidateOnFocus: true,
-      revalidateOnMount: true
+      revalidateOnMount: true,
+      revalidateOnFocus: true
     }
   )
 
@@ -73,52 +79,77 @@ const Dashboard: React.FC = ({
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  let accessToken: string = token
+  const bearer = `Bearer ${token}`
 
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
+  api.defaults.headers.common.Authorization = bearer
+
+  return (await axios
+    .get('http://54.85.180.1:3333/order/count', {
       headers: {
-        Cookie: `JID=${JID}`
+        Authorization: bearer
       }
     })
-
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15,
-        path: '/'
-      })
-
-      accessToken = response.data.accessToken
-
+    .then(resp => {
       return {
-        props: {}
+        props: {
+          numberOfOrders: resp.data.quantity
+        }
       }
-    }
-  }
+    })
+    .catch(async error => {
+      if (error.response.status === 401) {
+        try {
+          const response = await axios.get('http://54.85.180.1:3333/token', {
+            headers: {
+              Cookie: `JID=${JID}`
+            }
+          })
 
-  if (!accessToken) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false
+          setCookie(
+            { res: ctx.res },
+            'dashboard.access-token',
+            response.data.accessToken,
+            {
+              maxAge: 60 * 15,
+              path: '/'
+            }
+          )
+
+          const newbearer = `Bearer ${response.data.accessToken}`
+
+          api.defaults.headers.common.Authorization = newbearer
+
+          const numberOfOrders = await axios.get(
+            'http://54.85.180.1:3333/order/count',
+            {
+              headers: {
+                Authorization: newbearer
+              }
+            }
+          )
+
+          return {
+            props: {
+              numberOfOrders: numberOfOrders.data.quantity
+            }
+          }
+        } catch (error) {
+          destroyCookie({ res: ctx.res }, 'JID', {
+            httpOnly: true,
+            path: '/'
+          })
+
+          return {
+            redirect: {
+              destination: '/',
+              permanent: false
+            }
+          }
+        }
       }
-    }
-  }
-
-  const numberOfOrders = await api({
-    method: 'GET',
-    url: '/order/count',
-    baseURL: 'http://3.84.17.159:3333',
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
-
-  return {
-    props: {
-      numberOfOrders: numberOfOrders.data.quantity
-    }
-  }
+      /* eslint-disable */
+    })) as any
+    /* eslint-enable */
 }
 
 export default Dashboard

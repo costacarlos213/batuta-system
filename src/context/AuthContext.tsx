@@ -26,12 +26,13 @@ export const AuthProvider: React.FC = ({ children }) => {
   async function signIn({ email, password }: LoginDataType) {
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/login',
+        '/api/login',
         { email, password },
         {
           headers: { 'Content-Type': 'application/json' }
         }
       )
+
       const { accessToken } = response.data
 
       setCookie(undefined, 'dashboard.access-token', accessToken, {

@@ -1,13 +1,15 @@
+import axios from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { api } from 'src/services/api'
 
 const DeleteOrders = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse> => {
+  console.log('deleting...')
+
   const { headers, body } = req
   try {
-    const response = await api.delete('http://3.84.17.159:3333/order', {
+    const response = await axios.delete('http://54.85.180.1:3333/order', {
       headers,
       data: body
     })
@@ -19,9 +21,7 @@ const DeleteOrders = async (
   } catch (error) {
     const response = error?.response
 
-    if (response.config.__isRetryRequest) {
-      return res.redirect('/')
-    }
+    console.log(response.data)
 
     return res.status(response.status).json(response.data)
   }

@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
+import { IOrder } from 'src/pages/order/[id]'
 
 export interface ITableRow {
   id: string
@@ -25,7 +26,7 @@ export interface ITableRow {
 }
 
 interface ITableContent {
-  rows: ITableRow[]
+  rows: IOrder[]
   setChecked: React.Dispatch<React.SetStateAction<({ id: string } | boolean)[]>>
   checked: ({ id: string } | boolean)[]
 }
@@ -39,13 +40,15 @@ const DashboardTable: React.FC<ITableContent> = ({
 
   const reverseRows = rows
 
-  const handleOnChange = (position: number, id: string) => {
+  const handleOnChange = (position: number, order: IOrder) => {
     const updatedCheckedState = checked.map((item, index) => {
       if (index === position) {
         if (item) {
           return false
         } else {
-          return { id }
+          return {
+            ...order
+          }
         }
       } else {
         return item
@@ -106,7 +109,7 @@ const DashboardTable: React.FC<ITableContent> = ({
               >
                 <Checkbox
                   borderColor="gray.400"
-                  onChange={() => handleOnChange(index, row.id)}
+                  onChange={() => handleOnChange(index, row)}
                 />
               </Td>
               <Td

@@ -12,10 +12,13 @@ import {
   Modal,
   useDisclosure,
   ModalOverlay,
-  Textarea
+  Textarea,
+  Stack
 } from '@chakra-ui/react'
+import axios from 'axios'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { parseCookies, setCookie } from 'nookies'
+import { useRouter } from 'next/dist/client/router'
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import FieldsContainer from 'src/components/FieldsContainer'
 import FileUpload from 'src/components/FileUpload'
 import ModalContent from 'src/components/Modal'
@@ -52,6 +55,8 @@ const Order: React.FC = ({
 
   const [files, setFiles] = useState<File[]>()
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const router = useRouter()
 
   const { register, handleSubmit, control, watch, formState } =
     useForm<UseFormType>({
@@ -156,12 +161,16 @@ const Order: React.FC = ({
     })
 
     api
-      .put('http://3.84.17.159:3333/order', apiData)
+      .put('/api/updateOrder', apiData)
       .then(response => {
         console.log(response.data)
       })
-      .catch(error => {
-        console.log(error.data)
+      .catch(err => {
+        if (err?.response?.status === 401) {
+          router.push('/')
+        } else {
+          console.log(err)
+        }
       })
       .finally(() => setIsLoading(false))
   })
@@ -185,36 +194,86 @@ const Order: React.FC = ({
         closeOnOverlayClick
       >
         <ModalOverlay />
-        <ModalContent onClose={onClose} checkedFields={[{ id: order.id }]} />
+        <ModalContent onClose={onClose} checkedFields={[order]} />
       </Modal>
       <Flex
-        flexDirection="row"
+        flexDirection={['column', 'row']}
         width={['full', 'xl', 'xl', '2xl', '4xl']}
-        alignItems="flex-start"
+        alignItems={['center', 'flex-start']}
         justifyContent="space-between"
+        mb="3"
       >
-        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="8">
+        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="6">
           Dados do pedido
         </Heading>
-        <Button
-          onClick={onOpen}
-          backgroundColor="transparent"
-          _hover={{
-            backgroundColor: 'transparent',
-            opacity: 0.8
-          }}
+        <Flex
+          direction={['column-reverse', 'row']}
+          alignItems="center"
+          justifyContent="center"
         >
-          <Icon as={Trash2} color="red" />
-        </Button>
+          <Spinner
+            zIndex="9999"
+            size="sm"
+            mr={['0', '5']}
+            visibility={isLoading ? 'visible' : 'hidden'}
+            display="block"
+          />
+          <Stack
+            spacing={5}
+            direction="row"
+            alignItems="center"
+            mb={['6', '0']}
+          >
+            <Button
+              disabled={isLoading}
+              onClick={handleEdit}
+              px="3"
+              backgroundColor="gray.100"
+              _hover={{
+                backgroundColor: 'gray.300'
+              }}
+            >
+              <Icon as={Edit2} mr="2" />
+              Editar
+            </Button>
+            <Button
+              disabled={isLoading}
+              onClick={handleUpdate}
+              type="submit"
+              backgroundColor="whatsapp.500"
+              px="3"
+              color="white"
+              _hover={{
+                backgroundColor: 'green.400'
+              }}
+            >
+              <Icon as={Save} mr="2" />
+              Salvar
+            </Button>
+            <Button
+              onClick={onOpen}
+              isDisabled={isLoading}
+              backgroundColor="red.500"
+              _hover={{
+                backgroundColor: 'red.600'
+              }}
+            >
+              <Icon as={Trash2} color="white" />
+            </Button>
+          </Stack>
+        </Flex>
       </Flex>
 
       <Input
         cursor={'not-allowed'}
         placeholder="Código"
         isDisabled={isDisabled}
-        width="2xs"
+        _disabled={{
+          color: 'gray.200'
+        }}
+        width={['full', 'sm']}
         defaultValue={order.cod}
-        mb="-6"
+        mb="3"
         {...register('pedidos.0.cod', {
           maxLength: 4,
           required: false,
@@ -227,16 +286,10 @@ const Order: React.FC = ({
         index={0}
         register={register}
         phoneWatch={phoneWatch}
+        titleWatch={titleWatch}
         control={control}
         formState={formState}
       >
-        <RadioOptions
-          defaultValue={order.color}
-          titleWatch={titleWatch}
-          width="2xs"
-          control={control}
-          {...register('pedidos.0.color')}
-        />
         <Input
           placeholder="Data inicial"
           mr={['0', '6']}
@@ -278,42 +331,6 @@ const Order: React.FC = ({
           multiple
         />
       </FieldsContainer>
-      <Flex flexDirection="row" alignItems="center" mb="2">
-        <Button
-          disabled={isLoading}
-          onClick={handleEdit}
-          bg="transparent"
-          p="0"
-          mr="5"
-          _hover={{
-            color: 'black'
-          }}
-        >
-          <Icon as={Edit2} mr="1" />
-          Editar
-        </Button>
-        <Button
-          disabled={isLoading}
-          onClick={handleUpdate}
-          type="submit"
-          bg="transparent"
-          p="0"
-          mr="3"
-          color="whatsapp.500"
-          _hover={{
-            color: 'green.400'
-          }}
-        >
-          <Icon as={Save} mr="1" />
-          Salvar
-        </Button>
-        <Spinner
-          zIndex="9999"
-          size="sm"
-          ml="1"
-          display={isLoading ? 'block' : 'none'}
-        />
-      </Flex>
     </Box>
   )
 }
@@ -321,73 +338,9 @@ const Order: React.FC = ({
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const { 'dashboard.access-token': token, JID } = parseCookies(ctx)
 
-  let accessToken
+  const bearer = `Bearer ${token}`
 
-  if (token) {
-    accessToken = token
-  }
-
-  if (!token && JID) {
-    const response = await api.get('/api/refreshToken', {
-      headers: {
-        Cookie: `JID=${JID}`
-      }
-    })
-
-    if (response.data.accessToken) {
-      setCookie(ctx, 'dashboard.access-token', response.data.accessToken, {
-        maxAge: 60 * 15,
-        path: '/'
-      })
-
-      accessToken = response.data.accessToken
-    }
-  }
-
-  if (!accessToken) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false
-      }
-    }
-  }
-
-  const { params } = ctx
-
-  let order: IOrder
-
-  try {
-    const response = await api({
-      method: 'GET',
-      params: {
-        id: params?.id
-      },
-      url: '/order',
-      baseURL: 'http://3.84.17.159:3333',
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
-
-    if (!response.data || response.data.length === 0) {
-      return {
-        redirect: {
-          destination: '/dashboard',
-          permanent: false
-        }
-      }
-    }
-
-    order = response.data[0]
-  } catch (error) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false
-      }
-    }
-  }
+  api.defaults.headers.common.Authorization = bearer
 
   function formatPhone(value: string) {
     const parents = value.replace(/^(\d{2})(\d)/g, '($1) $2') // Coloca parênteses em volta dos dois primeiros dígitos
@@ -396,14 +349,105 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     return hifen
   }
 
-  return {
-    props: {
-      order: {
-        ...order,
-        phone: formatPhone(order.phone)
-      }
+  return (await axios({
+    method: 'GET',
+    params: {
+      id: ctx.params?.id
+    },
+    url: '/order',
+    baseURL: 'http://54.85.180.1:3333',
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-  }
+  })
+    .then(response => {
+      if (!response.data || response.data.length === 0) {
+        return {
+          redirect: {
+            destination: '/dashboard',
+            permanent: false
+          }
+        }
+      }
+
+      return {
+        props: {
+          order: {
+            ...response.data[0],
+            phone: formatPhone(response.data[0].phone)
+          }
+        }
+      }
+    })
+    .catch(async error => {
+      if (error.response.status === 401) {
+        try {
+          const response = await axios.get('http://54.85.180.1:3333/token', {
+            headers: {
+              Cookie: `JID=${JID}`
+            }
+          })
+
+          setCookie(
+            { res: ctx.res },
+            'dashboard.access-token',
+            response.data.accessToken,
+            {
+              maxAge: 60 * 15,
+              path: '/'
+            }
+          )
+
+          const newbearer = `Bearer ${response.data.accessToken}`
+
+          api.defaults.headers.common.Authorization = newbearer
+
+          const newResponse = await axios({
+            method: 'GET',
+            params: {
+              id: ctx.params?.id
+            },
+            url: '/order',
+            baseURL: 'http://54.85.180.1:3333',
+            headers: {
+              Authorization: newbearer
+            }
+          })
+
+          if (!newResponse.data || newResponse.data.length === 0) {
+            return {
+              redirect: {
+                destination: '/dashboard',
+                permanent: false
+              }
+            }
+          }
+
+          return {
+            props: {
+              order: {
+                ...newResponse.data[0],
+                phone: formatPhone(newResponse.data[0].phone)
+              }
+            }
+          }
+        } catch (error) {
+          destroyCookie({ res: ctx.res }, 'JID', {
+            httpOnly: true,
+            path: '/'
+          })
+
+          return {
+            redirect: {
+              destination: '/',
+              permanent: false
+            }
+          }
+        }
+      }
+      /* eslint-disable */
+    })) as any
+    /* eslint-enable */
 }
 
 export default Order

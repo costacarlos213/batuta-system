@@ -7,9 +7,10 @@ const Login = async (
   res: NextApiResponse
 ): Promise<void> => {
   const { headers, body } = req
+
   try {
     const response = await axios.post(
-      'http://3.84.17.159:3333/auth/login',
+      'http://54.85.180.1:3333/auth/login',
       body,
       {
         headers
@@ -28,7 +29,8 @@ const Login = async (
 
     res.status(200).json({ accessToken: response.data.accessToken })
   } catch (error) {
-    res.status(error.response.status).json({
+    console.log('ERROR ON LOGIN')
+    res.status(error?.response?.status).json({
       status: 401,
       data: {}
     })

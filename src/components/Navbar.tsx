@@ -29,7 +29,7 @@ const Navbar: React.FC<FlexProps> = props => {
           Dashboard
         </MenuItem>
         <MenuItem to="/search" fontSize={['md', 'md', 'md', 'md', 'xl', '2xl']}>
-          Pesquisar
+          Pesquisar pedidos
         </MenuItem>
       </HStack>
       <Box>
