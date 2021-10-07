@@ -10,7 +10,7 @@ const Print = async (
   console.log('printing')
 
   try {
-    const response = await axios.post('http://54.85.180.1:3333/print', body, {
+    const response = await axios.post(`${process.env.API_URL}/print`, body, {
       responseType: 'arraybuffer',
       headers
     })

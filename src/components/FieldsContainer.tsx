@@ -10,7 +10,6 @@ import {
   Input as ChakraInput,
   Flex,
   FormControl,
-  FormErrorMessage,
   Button,
   Icon,
   Text
@@ -40,7 +39,6 @@ interface IFieldsContainer {
 const FieldsContainer: React.FC<IFieldsContainer> = ({
   register,
   defaultValues,
-  formState,
   border = false,
   disabled = false,
   phoneWatch,
@@ -50,8 +48,6 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
   handleRemove,
   children
 }) => {
-  const { errors } = formState
-
   let initialPhoneMask = '(99) 9999-9999?'
 
   if (defaultValues?.phone) {
@@ -72,16 +68,22 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
   }, [phoneWatch])
 
   const vendorOptions = [
-    { label: 'Camila', value: 'Camila' },
+    { label: 'Camilla', value: 'Camilla' },
     { label: 'Jéssica', value: 'Jessica' },
     { label: 'Renata', value: 'Renata' },
     { label: 'Laildon', value: 'Laildon' },
+    { label: 'Ester', value: 'Ester' },
+    { label: 'Geovane', value: 'Geovane' },
     { label: 'Dougllas', value: 'Dougllas' }
   ]
 
   const descOptions = [
     { label: 'Kit bandeira 2 metros', value: 'Kit bandeira 2 metros' },
-    { label: 'Kit bandeira 3 metros', value: 'Kit bandeira 3 metros' }
+    { label: 'Kit bandeira 3 metros', value: 'Kit bandeira 3 metros' },
+    { label: '2 Kits bandeira 2 metros', value: '2 Kits bandeira 2 metros' },
+    { label: '2 Kits bandeira 3 metros', value: '2 Kits bandeira 3 metros' },
+    { label: '3 Kits bandeira 2 metros', value: '3 Kits bandeira 2 metros' },
+    { label: '3 Kits bandeira 3 metros', value: '3 Kits bandeira 3 metros' }
   ]
 
   const titleOptions = [
@@ -91,7 +93,14 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
 
   const deliveryOptions = [
     { label: 'Motoboy', value: 'Motoboy' },
+    { label: 'Motoboy (Comercial)', value: 'Motoboy (Comercial)' },
     { label: 'Transportadora', value: 'Transportadora' },
+    {
+      label: 'Transportadora (Comercial)',
+      value: 'Transportadora (Comercial)'
+    },
+    { label: 'Transportadora RJ', value: 'Transportadora RJ' },
+    { label: 'Transportadora SP', value: 'Transportadora SP' },
     { label: 'Retirar', value: 'Retirar' },
     { label: 'Correio', value: 'Correio' }
   ]
@@ -119,6 +128,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
     >
       <ChakraReactSelect
         mr={['0', '6']}
+        disabled={disabled}
         control={control}
         width={['full', 'sm']}
         placeholder="Vendedor"
@@ -188,6 +198,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
         </Stack>
         <ChakraReactSelect
           control={control}
+          disabled={disabled}
           placeholder="Descrição do produto"
           width={['full', '3xl']}
           defaultOptions={descOptions}
@@ -225,12 +236,12 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
                 shadow: 0
               }}
               {...register(`pedidos.${index}.total`, {
-                required: false,
-                valueAsNumber: true
+                required: false
               })}
             />
           </InputGroup>
           <ChakraReactSelect
+            disabled={disabled}
             defaultValue={defaultValues?.payment}
             control={control}
             defaultOptions={paymentOptions}
@@ -246,6 +257,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           defaultValue={defaultValues?.title}
           defaultOptions={titleOptions}
           control={control}
+          disabled={disabled}
           width={['full', 'sm']}
           placeholder="Resumo do pedido"
           {...register(`pedidos.${index}.title`, {
@@ -272,6 +284,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
         />
         <ChakraReactSelect
           defaultValue={defaultValues?.delivery}
+          disabled={disabled}
           defaultOptions={deliveryOptions}
           control={control}
           width={['full', 'sm']}
@@ -282,7 +295,6 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           })}
         />
         {children}
-        <FormErrorMessage>{errors?.pedidos?.[index]?.message}</FormErrorMessage>
       </Stack>
     </FormControl>
   )

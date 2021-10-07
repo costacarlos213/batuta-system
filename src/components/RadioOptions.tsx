@@ -62,10 +62,10 @@ const RadioOptions: React.FC<IRadioOptions & UseFormRegisterReturn> = ({
           >
             <Stack direction="row" spacing="10" fontWeight="semibold">
               <Radio value="green" isDisabled={disabled}>
-                Verde
+                Amarelo
               </Radio>
               <Radio value="yellow" isDisabled={disabled}>
-                Amarelo
+                Cinza
               </Radio>
             </Stack>
           </RadioGroup>

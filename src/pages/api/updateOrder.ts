@@ -42,7 +42,7 @@ const NewOrders = async (
 
     busboy.on('finish', () => {
       axios
-        .put('http://54.85.180.1:3333/order', formData, {
+        .put(`${process.env.API_URL}/order`, formData, {
           headers: {
             Authorization: headers.authorization || '',
             origin: headers.origin,

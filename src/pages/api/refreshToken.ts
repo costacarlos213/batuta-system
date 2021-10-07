@@ -14,7 +14,7 @@ const RefreshToken = async (
       data,
       headers: returnedHeaders,
       status
-    } = await axios.get('http://54.85.180.1:3333/token', {
+    } = await axios.get(`${process.env.API_URL}/token`, {
       headers,
       withCredentials: true
     })
@@ -27,11 +27,6 @@ const RefreshToken = async (
 
     res.status(200).json(data)
   } catch (error) {
-    res.setHeader(
-      'set-cookie',
-      'JID=; Max-Age=-1; Path=/; HttpOnly; SameSite=Lax'
-    )
-
     res.redirect('/')
   }
 }

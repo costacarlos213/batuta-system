@@ -21,25 +21,40 @@ const Dashboard: React.FC = ({
   const { data, error } = useSWR(
     '/api/getOrders',
     async url => {
-      try {
-        const response = await api.get(url)
+      const { 'dashboard.access-token': token } = parseCookies()
 
-        if (response.data) {
-          const newLength = response.data.length - numberOfOrders
-
-          for (let i = 0; i < newLength; i++) {
-            setChecked([...checked, false])
+      return api
+        .get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-        }
+        })
+        .then(response => {
+          console.log('Response')
 
-        return response.data
-      } catch (error) {
-        router.push('/')
-      }
+          if (response.data) {
+            if (response.data.message === 'Invalid Session') {
+              router.replace('/')
+            }
+
+            const newLength = response.data.length - numberOfOrders
+
+            for (let i = 0; i < newLength; i++) {
+              setChecked([...checked, false])
+            }
+          }
+
+          return response.data
+        })
+        .catch(error => {
+          if (error.response.status === 401) {
+            router.replace('/')
+          }
+        })
     },
     {
       revalidateOnMount: true,
-      revalidateOnFocus: true
+      shouldRetryOnError: false
     }
   )
 
@@ -84,7 +99,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   api.defaults.headers.common.Authorization = bearer
 
   return (await axios
-    .get('http://54.85.180.1:3333/order/count', {
+    .get(`${process.env.API_URL}/order/count`, {
       headers: {
         Authorization: bearer
       }
@@ -99,7 +114,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     .catch(async error => {
       if (error.response.status === 401) {
         try {
-          const response = await axios.get('http://54.85.180.1:3333/token', {
+          const response = await axios.get(`${process.env.API_URL}/token`, {
             headers: {
               Cookie: `JID=${JID}`
             }
@@ -110,7 +125,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             'dashboard.access-token',
             response.data.accessToken,
             {
-              maxAge: 60 * 15,
+              maxAge: 60,
               path: '/'
             }
           )
@@ -120,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
           api.defaults.headers.common.Authorization = newbearer
 
           const numberOfOrders = await axios.get(
-            'http://54.85.180.1:3333/order/count',
+            `${process.env.API_URL}/order/count`,
             {
               headers: {
                 Authorization: newbearer

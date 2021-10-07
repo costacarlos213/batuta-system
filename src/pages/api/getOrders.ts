@@ -6,8 +6,9 @@ const GetOrders = async (
   res: NextApiResponse
 ): Promise<void | NextApiResponse> => {
   const { headers } = req
+
   try {
-    const response = await api.get('http://54.85.180.1:3333/order', {
+    const response = await api.get(`${process.env.API_URL}/order`, {
       headers
     })
 
@@ -17,9 +18,14 @@ const GetOrders = async (
 
     res.status(200).send(response.data)
   } catch (error) {
+    console.log('error!')
+    console.log(error)
+
     const response = error?.response
 
-    res.status(response.status).send(response.data)
+    console.log(response)
+
+    res.status(response?.status).send(response?.data)
   }
 }
 

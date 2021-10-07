@@ -36,7 +36,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       const { accessToken } = response.data
 
       setCookie(undefined, 'dashboard.access-token', accessToken, {
-        maxAge: 60 * 15,
+        maxAge: 60,
         path: '/'
       })
 

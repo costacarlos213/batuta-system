@@ -44,7 +44,7 @@ const NewOrders = async (
       console.log('creating order')
 
       axios
-        .post('http://54.85.180.1:3333/order', formData, {
+        .post(`${process.env.API_URL}/order`, formData, {
           headers: {
             Authorization: headers.authorization || '',
             origin: headers.origin,
@@ -63,15 +63,15 @@ const NewOrders = async (
         .catch(err => {
           const response = err?.response
 
-          res.status(response.status).send(response.data)
+          console.log(response.status)
+
+          res.status(response.status).json(response.data)
         })
     })
 
     req.pipe(busboy)
   } catch (error) {
-    const response = error?.response
-
-    res.status(response.status).json(response.data)
+    res.status(500).send(error)
   }
 }
 

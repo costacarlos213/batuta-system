@@ -102,7 +102,7 @@ const Search: React.FC = () => {
           width={['full', 'sm']}
           mb="4"
           {...register('pedidos.0.cod', {
-            maxLength: 4,
+            minLength: 4,
             required: false,
             pattern: /^[A-Z]\d+$/s
           })}

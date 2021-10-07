@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     method: 'GET',
     params: ctx.query,
     url: '/order',
-    baseURL: 'http://54.85.180.1:3333',
+    baseURL: process.env.API_URL,
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     .catch(async error => {
       if (error.response.status === 401) {
         try {
-          const response = await axios.get('http://54.85.180.1:3333/token', {
+          const response = await axios.get(`${process.env.API_URL}/token`, {
             headers: {
               Cookie: `JID=${JID}`
             }
@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             'dashboard.access-token',
             response.data.accessToken,
             {
-              maxAge: 60 * 15,
+              maxAge: 60,
               path: '/'
             }
           )
@@ -98,7 +98,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             method: 'GET',
             params: ctx.query,
             url: '/order',
-            baseURL: 'http://54.85.180.1:3333',
+            baseURL: process.env.API_URL,
             headers: {
               Authorization: newbearer
             }

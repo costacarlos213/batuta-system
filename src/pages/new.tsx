@@ -5,44 +5,45 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import {
   Box,
   Button,
-  Flex,
   Heading,
   Icon,
   Spinner,
+  Stack,
+  Text,
   Textarea
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { parseCookies } from 'nookies'
-import RadioOptions from 'src/components/RadioOptions'
 import { api } from 'src/services/api'
 import { validateFiles } from 'src/utils/validateFiles'
 
-import { UseFormType } from '../../@types/pedidos'
+import { FormValues, UseFormType } from '../../@types/pedidos'
 import FieldsContainer from '../components/FieldsContainer'
 import FileUpload from '../components/FileUpload'
 
 const New: React.FC = () => {
   const [isDisabled, setDisabled] = useState(false)
+  const [error, setError] = useState<null | string>(null)
 
   const { register, handleSubmit, formState, control, watch } =
     useForm<UseFormType>({
       defaultValues: {
         pedidos: [
           {
-            cod: undefined,
-            address: undefined,
-            customerName: undefined,
-            delivery: undefined,
-            description: undefined,
+            cod: '',
+            address: '',
+            customerName: '',
+            delivery: '',
+            description: '',
             file_: undefined,
-            payment: undefined,
-            phone: undefined,
-            total: undefined,
-            comments: undefined,
-            color: undefined,
-            title: undefined,
-            vendor: undefined
+            payment: '',
+            phone: '',
+            total: 0,
+            comments: '',
+            color: 'green',
+            title: '',
+            vendor: ''
           }
         ]
       }
@@ -63,22 +64,20 @@ const New: React.FC = () => {
 
     const formData = new FormData()
     data.pedidos.map(order => {
-      formData.append('orders[cod]', order.cod)
-      formData.append('orders[address]', order.address)
-      formData.append('orders[customerName]', order.customerName)
-      formData.append('orders[description]', order.description)
-      formData.append('orders[payment]', order.payment)
-      formData.append('orders[phone]', order.phone.replace(/\D+/g, ''))
-      formData.append('orders[total]', order.total.toString())
-      formData.append('orders[vendor]', order.vendor)
-      formData.append('orders[delivery]', order.delivery)
-      formData.append('orders[comments]', order.comments)
-      formData.append('orders[title]', order.title)
-      formData.append('orders[color]', order.color)
+      Object.keys(order).forEach(key => {
+        if (key === 'file_') {
+          for (let i = 0; i < order.file_.length; i++) {
+            formData.append(`orders[file_${index}_${i}]`, order.file_[i])
+          }
 
-      for (let i = 0; i < order.file_.length; i++) {
-        formData.append(`orders[file_${index}_${i}]`, order.file_[i])
-      }
+          return
+        }
+
+        formData.append(
+          `orders[${key}]`,
+          order[key as keyof FormValues]?.toString()
+        )
+      })
 
       index++
     })
@@ -86,13 +85,21 @@ const New: React.FC = () => {
     api
       .post('/api/newOrder', formData)
       .then(() => {
-        router.push('/dashboard')
+        window.location.pathname = '/dashboard'
       })
       .catch(err => {
         if (err?.response?.status === 401) {
-          router.push('/')
+          router.replace('/')
         } else {
-          console.log(err)
+          const message = err?.response?.data.message
+
+          if (message === 'Invalid Code') {
+            setError('Campo "vendedor" inválido.')
+          } else if (message === 'Invalid Phone') {
+            setError('Campo "telefone" inválido.')
+          } else {
+            setError(message)
+          }
         }
       })
       .finally(() => {
@@ -106,19 +113,19 @@ const New: React.FC = () => {
 
   function addNewFormSection() {
     append({
-      cod: undefined,
-      address: undefined,
-      customerName: undefined,
-      delivery: undefined,
-      description: undefined,
+      cod: '',
+      address: '',
+      customerName: '',
+      delivery: '',
+      description: '',
       file_: undefined,
-      payment: undefined,
-      phone: undefined,
-      total: undefined,
-      vendor: undefined,
-      color: undefined,
-      title: undefined,
-      comments: undefined
+      payment: '',
+      phone: '',
+      total: 0,
+      vendor: '',
+      color: 'green',
+      title: '',
+      comments: ''
     })
   }
 
@@ -167,50 +174,7 @@ const New: React.FC = () => {
                 border={false}
               >
                 <Textarea
-                  placeholder="Observações"
-                  resize="none"
-                  size="md"
-                  h={['unset', '32']}
-                  w={['full', 'xl']}
-                  _placeholder={{
-                    color: 'gray.200'
-                  }}
-                  borderColor="gray.500"
-                  _hover={{
-                    borderColor: '#B3B3B3'
-                  }}
-                  _focus={{
-                    shadow: 0
-                  }}
-                  {...register(`pedidos.${index}.comments`, {
-                    required: false,
-                    maxLength: 250
-                  })}
-                />
-                <FileUpload
-                  accept="image/*"
-                  register={register(`pedidos.${index}.file_`, {
-                    validate: validateFiles
-                  })}
-                  multiple
-                />
-              </FieldsContainer>
-            )
-          } else {
-            return (
-              <FieldsContainer
-                titleWatch={titleWatch}
-                handleRemove={index !== 0 ? removeFormSection : undefined}
-                control={control}
-                disabled={isDisabled}
-                index={index}
-                key={field.id}
-                register={register}
-                phoneWatch={phoneWatch}
-                formState={formState}
-                border
-              >
-                <Textarea
+                  cursor="text"
                   placeholder="Observações"
                   resize="none"
                   size="md"
@@ -235,7 +199,53 @@ const New: React.FC = () => {
                   accept="image/*"
                   register={register(`pedidos.${index}.file_`, {
                     validate: validateFiles,
-                    required: true
+                    required: false
+                  })}
+                  multiple
+                />
+              </FieldsContainer>
+            )
+          } else {
+            return (
+              <FieldsContainer
+                titleWatch={titleWatch}
+                handleRemove={index !== 0 ? removeFormSection : undefined}
+                control={control}
+                disabled={isDisabled}
+                index={index}
+                key={field.id}
+                register={register}
+                phoneWatch={phoneWatch}
+                formState={formState}
+                border
+              >
+                <Textarea
+                  cursor="text"
+                  placeholder="Observações"
+                  resize="none"
+                  size="md"
+                  h={['unset', '32']}
+                  w={['full', 'xl']}
+                  _placeholder={{
+                    color: 'gray.200'
+                  }}
+                  borderColor="gray.500"
+                  _hover={{
+                    borderColor: '#B3B3B3'
+                  }}
+                  _focus={{
+                    shadow: 0
+                  }}
+                  {...register(`pedidos.${index}.comments`, {
+                    required: false,
+                    maxLength: 250
+                  })}
+                />
+                <FileUpload
+                  accept="image/*"
+                  register={register(`pedidos.${index}.file_`, {
+                    validate: validateFiles,
+                    required: false
                   })}
                   multiple
                 >
@@ -260,13 +270,16 @@ const New: React.FC = () => {
             )
           }
         })}
-        <Flex flexDirection="row" alignItems="center">
+        {error && (
+          <Text mb="5" color="red" fontWeight="medium">
+            {error}
+          </Text>
+        )}
+        <Stack direction="row" alignItems="center" spacing="5" pb="6">
           <Button
             disabled={isDisabled}
             onClick={addNewFormSection}
             px="5"
-            mb="6"
-            mr="6"
             fontWeight="medium"
             fontSize="md"
             backgroundColor="gray.100"
@@ -278,7 +291,6 @@ const New: React.FC = () => {
             Adicionar
           </Button>
           <Button
-            mb="6"
             disabled={isDisabled}
             type="submit"
             fontWeight="semibold"
@@ -296,10 +308,9 @@ const New: React.FC = () => {
           <Spinner
             zIndex="9999"
             size="sm"
-            ml="1"
             display={isDisabled ? 'block' : 'none'}
           />
-        </Flex>
+        </Stack>
       </form>
     </Box>
   )

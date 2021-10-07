@@ -55,14 +55,28 @@ const FileUpload: React.FC<IFileUpload> = ({
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     if (inputRef.current) {
-      const [, fileName] = e.currentTarget.id.split('$')
+      const [, fileName, fileSize] = e.currentTarget.id.split('$')
       const storedFiles = files
-      const filteredArray = storedFiles.filter(
-        element => element.name !== fileName
-      )
 
-      imageRef.current = filteredArray
-      setFiles(filteredArray)
+      const removedIndex = -1
+
+      const filteredFiles = storedFiles.filter(element => {
+        if (element.name !== fileName) {
+          return true
+        }
+
+        if (element.name === fileName && element.size.toString() !== fileSize) {
+          return true
+        }
+
+        return false
+      })
+
+      storedFiles.splice(removedIndex, 1)
+      console.log(storedFiles)
+
+      imageRef.current = filteredFiles
+      setFiles(filteredFiles)
 
       const clipBoard =
         new ClipboardEvent('').clipboardData || new DataTransfer()
@@ -133,7 +147,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       {files.map(file => {
         const uniqueId = `${Math.floor(Math.random() * 10000000000)}$${
           file.name
-        }`
+        }$${file.size}`
 
         return (
           <Box

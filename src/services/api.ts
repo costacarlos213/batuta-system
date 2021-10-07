@@ -1,9 +1,10 @@
 import axios from 'axios'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
-import { setCookie } from 'nookies'
+import { destroyCookie, setCookie } from 'nookies'
 
 const api = axios.create({
-  withCredentials: true
+  withCredentials: true,
+  baseURL: 'https://biruta-wind-system.vercel.app'
 })
 
 createAuthRefreshInterceptor(api, error =>
@@ -17,8 +18,14 @@ createAuthRefreshInterceptor(api, error =>
     const bearer = `Bearer ${accessToken}`
 
     if (!accessToken) {
+      console.log('responsed')
+
       api.defaults.headers.setCookie =
         'JID=; Max-Age=-1; Path=/; HttpOnly; SameSite=Lax'
+
+      destroyCookie({ res: error.response }, 'dashboard.access-token', {
+        path: '/'
+      })
 
       return Promise.resolve()
     }
@@ -28,7 +35,7 @@ createAuthRefreshInterceptor(api, error =>
     error.response.config.headers.Authorization = bearer
 
     setCookie({ res: error.response }, 'dashboard.access-token', accessToken, {
-      maxAge: 60 * 15,
+      maxAge: 60,
       path: '/'
     })
 

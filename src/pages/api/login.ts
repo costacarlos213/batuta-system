@@ -10,7 +10,7 @@ const Login = async (
 
   try {
     const response = await axios.post(
-      'http://54.85.180.1:3333/auth/login',
+      `${process.env.API_URL}/auth/login`,
       body,
       {
         headers
@@ -30,10 +30,10 @@ const Login = async (
     res.status(200).json({ accessToken: response.data.accessToken })
   } catch (error) {
     console.log('ERROR ON LOGIN')
-    res.status(error?.response?.status).json({
-      status: 401,
-      data: {}
-    })
+
+    console.log(error)
+
+    res.status(error?.response?.status).json({})
   }
 }
 

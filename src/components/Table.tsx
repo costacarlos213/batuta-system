@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, createRef } from 'react'
 
 import {
   Table,
@@ -11,8 +11,13 @@ import {
   Checkbox
 } from '@chakra-ui/react'
 import dayjs from 'dayjs'
+import tz from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'next/router'
 import { IOrder } from 'src/pages/order/[id]'
+
+dayjs.extend(utc)
+dayjs.extend(tz)
 
 export interface ITableRow {
   id: string
@@ -36,13 +41,17 @@ const DashboardTable: React.FC<ITableContent> = ({
   setChecked,
   checked
 }) => {
+  let checkedCheckboxes = checked
   const router = useRouter()
-
   const reverseRows = rows
+  const checkboxRefs = useRef<{ current: HTMLInputElement }[]>([])
+  checkboxRefs.current = reverseRows.map(
+    (row, i) => checkboxRefs.current[i] ?? createRef()
+  )
 
-  const handleOnChange = (position: number, order: IOrder) => {
-    const updatedCheckedState = checked.map((item, index) => {
-      if (index === position) {
+  const handleOnChange = (checkboxPos: number, order: IOrder) => {
+    const updatedCheckedState = checkedCheckboxes.map((item, index) => {
+      if (index === checkboxPos) {
         if (item) {
           return false
         } else {
@@ -55,7 +64,10 @@ const DashboardTable: React.FC<ITableContent> = ({
       }
     })
 
-    setChecked(updatedCheckedState)
+    checkedCheckboxes = updatedCheckedState
+    setChecked(checkedCheckboxes)
+
+    return updatedCheckedState
   }
 
   return (
@@ -65,9 +77,17 @@ const DashboardTable: React.FC<ITableContent> = ({
           <Th
             display="table-cell"
             px="0.5"
-            borderColor="gray.300"
             width="min-content"
-          ></Th>
+            borderColor="gray.300"
+            cursor="pointer"
+            onClick={() => {
+              checkboxRefs.current.forEach(checkboxRef => {
+                checkboxRef.current.click()
+              })
+            }}
+          >
+            <Checkbox borderColor="gray.400" pointerEvents="none" />
+          </Th>
           <Th display="table-cell" px="1" borderColor="gray.300">
             Cód.
           </Th>
@@ -106,9 +126,15 @@ const DashboardTable: React.FC<ITableContent> = ({
                 px="0.5"
                 width="min-content"
                 borderColor="gray.300"
+                cursor="pointer"
+                onClick={() => {
+                  checkboxRefs.current[index].current.click()
+                }}
               >
                 <Checkbox
                   borderColor="gray.400"
+                  ref={checkboxRefs?.current[index]}
+                  pointerEvents="none"
                   onChange={() => handleOnChange(index, row)}
                 />
               </Td>
@@ -128,7 +154,7 @@ const DashboardTable: React.FC<ITableContent> = ({
                 borderColor="gray.300"
                 onClick={() => router.push(`/order/${row.id}`)}
               >
-                {dayjs(row.date).format('DD/MM/YYYY')}
+                {dayjs.utc(row.date).format('DD/MM/YYYY')}
               </Td>
               <Td
                 display="table-cell"
@@ -186,7 +212,7 @@ const DashboardTable: React.FC<ITableContent> = ({
                 isNumeric
                 onClick={() => router.push(`/order/${row.id}`)}
               >
-                {parseFloat(row.total).toFixed(2)}
+                {parseFloat(row.total || '0').toFixed(2)}
               </Td>
               <Td
                 display="table-cell"

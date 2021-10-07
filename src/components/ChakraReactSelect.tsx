@@ -23,7 +23,7 @@ interface IReactSelect {
 
 const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
   placeholder = '',
-  disabled,
+  disabled = false,
   defaultOptions,
   defaultValue,
   ml,
@@ -51,9 +51,11 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
   ) => {
     if (actionMeta.action === 'clear') {
       setValue({
-        label: capitalizeFirstLetter(defaultValue || placeholder),
-        value: capitalizeFirstLetter(defaultValue || placeholder)
+        label: capitalizeFirstLetter(placeholder),
+        value: capitalizeFirstLetter(placeholder)
       })
+
+      console.log()
     } else if (actionMeta.action === 'select-option') {
       setValue({
         label: newValue.label,
@@ -84,7 +86,7 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
           <Select
             isDisabled={disabled}
             styles={customStyles}
-            isClearable
+            isClearable={!disabled}
             isSearchable
             onCreateOption={value => {
               const capitalizedValue = capitalizeFirstLetter(value)
@@ -94,7 +96,7 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
             options={options}
             placeholder={placeholder}
             onChange={(value, actionMeta) => {
-              onChange(value?.value)
+              onChange(value?.value || '')
               handleChange(value, actionMeta)
             }}
             {...rest}

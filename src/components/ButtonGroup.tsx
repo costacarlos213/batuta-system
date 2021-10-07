@@ -24,10 +24,17 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
     setIsLoading(true)
 
     try {
+      const filteredChecked = checkedFields.filter((item: IOrder | boolean) =>
+        typeof item !== 'boolean' ? item : null
+      )
+
       const response = await api.post(
         '/api/print',
         {
-          printArray: printData,
+          printArray:
+            filteredChecked.length === 0
+              ? printData.reverse()
+              : filteredChecked.reverse(),
           type: 'simple'
         },
         {
@@ -52,6 +59,8 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
       } else {
         console.log(err)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -63,13 +72,13 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
         typeof item !== 'boolean' ? item : null
       )
 
-      console.log(filteredChecked)
-
       const response = await api.post(
         '/api/print',
         {
           printArray:
-            filteredChecked.length === 0 ? printData : filteredChecked,
+            filteredChecked.length === 0
+              ? printData.reverse()
+              : filteredChecked.reverse(),
           type: 'full'
         },
         {
@@ -94,6 +103,8 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
       } else {
         console.log(err)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 

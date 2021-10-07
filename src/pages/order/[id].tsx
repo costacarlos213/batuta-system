@@ -16,13 +16,15 @@ import {
   Stack
 } from '@chakra-ui/react'
 import axios from 'axios'
+import dayjs from 'dayjs'
+import tz from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import FieldsContainer from 'src/components/FieldsContainer'
 import FileUpload from 'src/components/FileUpload'
 import ModalContent from 'src/components/Modal'
-import RadioOptions from 'src/components/RadioOptions'
 import { api } from 'src/services/api'
 import { validateFiles } from 'src/utils/validateFiles'
 
@@ -46,6 +48,9 @@ export interface IOrder {
   total: string
   vendor: string
 }
+
+dayjs.extend(utc)
+dayjs.extend(tz)
 
 const Order: React.FC = ({
   order
@@ -90,7 +95,9 @@ const Order: React.FC = ({
       })
 
       const blob = await response.blob()
-      const file = new File([blob], url.split('%40')[1], { type: blob.type })
+      const file = new File([blob], decodeURI(url.split('%40')[1]), {
+        type: blob.type
+      })
 
       clipboard.items.add(file)
 
@@ -116,47 +123,65 @@ const Order: React.FC = ({
     const deletedFiles: string[] = []
     const insertedFiles: File[] = []
 
-    await order.fileNames.forEach((fileName: string) => {
-      const trimmedName = fileName.split('@')[1]
+    for (let index = 0; index < order.fileNames.length; index++) {
+      let exists = false
 
-      const index = Array.from(formData.file_).findIndex(
-        file => file.name === trimmedName
-      )
-
-      if (index === -1) {
-        deletedFiles.push(fileName)
+      for (let i = 0; i < formData.file_.length; i++) {
+        if (
+          order.fileNames[index].split('@')[1] === formData.file_[i].name &&
+          order.fileSizes[index] === formData.file_[i].size
+        ) {
+          exists = true
+        }
       }
-    })
+
+      if (!exists) {
+        deletedFiles.push(order.fileNames[index])
+      }
+    }
 
     await Array.from(formData.file_).forEach(file => {
-      const index = order.fileNames.find((fileName: string) => {
-        return fileName.split('@')[1] === file.name
-      })
+      let index = false
 
-      if (!index) {
-        insertedFiles.push(file)
+      for (let i = 0; i < order.fileNames.length; i++) {
+        if (index) {
+          return
+        }
+
+        if (
+          order.fileNames[i].split('@')[1] === file.name &&
+          order.fileSizes[i] === file.size
+        ) {
+          index = true
+        } else {
+          index = false
+        }
       }
+
+      if (!index) insertedFiles.push(file)
     })
 
     const apiData = new FormData()
     apiData.append('id', order.id)
 
     Object.keys(formData).forEach(key => {
-      if (formData[key as keyof FormValues]) {
-        if (key === 'file_') {
-          for (let i = 0; i < insertedFiles.length; i++) {
-            apiData.append(`insertedFiles_${i}`, insertedFiles[i])
-          }
-
-          apiData.append('deletedFiles', JSON.stringify(deletedFiles))
-        } else if (key === 'phone') {
-          apiData.append(
-            'phone',
-            (formData as any)[key].toString().replace(/\D+/g, '')
-          )
-        } else {
-          apiData.append(key, (formData as any)[key].toString())
+      if (key === 'file_') {
+        for (let i = 0; i < insertedFiles.length; i++) {
+          apiData.append(`insertedFiles_${i}`, insertedFiles[i])
         }
+
+        apiData.append('deletedFiles', JSON.stringify(deletedFiles))
+      } else if (key === 'phone') {
+        apiData.append('phone', formData[key].toString().replace(/\D+/g, ''))
+      } else if (key === 'initialDate') {
+        const date = dayjs
+          .utc(formData[key as keyof FormValues] as string)
+          .tz('America/Sao_Paulo')
+          .format()
+
+        apiData.append(key, date)
+      } else {
+        apiData.append(key, formData[key as keyof FormValues]?.toString())
       }
     })
 
@@ -224,32 +249,36 @@ const Order: React.FC = ({
             alignItems="center"
             mb={['6', '0']}
           >
-            <Button
-              disabled={isLoading}
-              onClick={handleEdit}
-              px="3"
-              backgroundColor="gray.100"
-              _hover={{
-                backgroundColor: 'gray.300'
-              }}
-            >
-              <Icon as={Edit2} mr="2" />
-              Editar
-            </Button>
-            <Button
-              disabled={isLoading}
-              onClick={handleUpdate}
-              type="submit"
-              backgroundColor="whatsapp.500"
-              px="3"
-              color="white"
-              _hover={{
-                backgroundColor: 'green.400'
-              }}
-            >
-              <Icon as={Save} mr="2" />
-              Salvar
-            </Button>
+            {isDisabled && (
+              <Button
+                disabled={isLoading}
+                onClick={handleEdit}
+                px="3"
+                backgroundColor="gray.100"
+                _hover={{
+                  backgroundColor: 'gray.300'
+                }}
+              >
+                <Icon as={Edit2} mr="2" />
+                Editar
+              </Button>
+            )}
+            {!isDisabled && (
+              <Button
+                disabled={isLoading}
+                onClick={handleUpdate}
+                type="submit"
+                backgroundColor="whatsapp.500"
+                px="3"
+                color="white"
+                _hover={{
+                  backgroundColor: 'green.400'
+                }}
+              >
+                <Icon as={Save} mr="2" />
+                Salvar
+              </Button>
+            )}
             <Button
               onClick={onOpen}
               isDisabled={isLoading}
@@ -275,7 +304,7 @@ const Order: React.FC = ({
         defaultValue={order.cod}
         mb="3"
         {...register('pedidos.0.cod', {
-          maxLength: 4,
+          minLength: 4,
           required: false,
           pattern: /^[A-Z]\d+$/s
         })}
@@ -295,7 +324,7 @@ const Order: React.FC = ({
           mr={['0', '6']}
           type="date"
           mb={['5', '0']}
-          defaultValue={order.date.split('T')[0]}
+          defaultValue={dayjs.utc(order.date).format().split('T')[0]}
           width="2xs"
           {...register('pedidos.0.initialDate')}
         />
@@ -326,7 +355,8 @@ const Order: React.FC = ({
           defaultValue={files}
           accept="image/*"
           register={register('pedidos.0.file_', {
-            validate: validateFiles
+            validate: validateFiles,
+            required: false
           })}
           multiple
         />
@@ -355,7 +385,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
       id: ctx.params?.id
     },
     url: '/order',
-    baseURL: 'http://54.85.180.1:3333',
+    baseURL: process.env.API_URL,
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -382,7 +412,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     .catch(async error => {
       if (error.response.status === 401) {
         try {
-          const response = await axios.get('http://54.85.180.1:3333/token', {
+          const response = await axios.get(`${process.env.API_URL}/token`, {
             headers: {
               Cookie: `JID=${JID}`
             }
@@ -393,7 +423,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             'dashboard.access-token',
             response.data.accessToken,
             {
-              maxAge: 60 * 15,
+              maxAge: 60,
               path: '/'
             }
           )
@@ -408,7 +438,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
               id: ctx.params?.id
             },
             url: '/order',
-            baseURL: 'http://54.85.180.1:3333',
+            baseURL: process.env.API_URL,
             headers: {
               Authorization: newbearer
             }

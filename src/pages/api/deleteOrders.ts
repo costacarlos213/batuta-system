@@ -9,7 +9,7 @@ const DeleteOrders = async (
 
   const { headers, body } = req
   try {
-    const response = await axios.delete('http://54.85.180.1:3333/order', {
+    const response = await axios.delete(`${process.env.API_URL}/order`, {
       headers,
       data: body
     })

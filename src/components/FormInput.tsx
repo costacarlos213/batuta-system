@@ -10,6 +10,7 @@ interface IFormInput extends InputProps {
 const FormInput: React.FC<IFormInput> = ({ ...rest }) => {
   return (
     <Input
+      cursor="text"
       variant="flushed"
       _placeholder={{
         color: 'gray.200'

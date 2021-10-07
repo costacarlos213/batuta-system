@@ -1,18 +1,16 @@
 import React from 'react'
 
-import { Text, TextProps } from '@chakra-ui/react'
+import { Text } from '@chakra-ui/react'
 import Link from 'next/link'
 
-interface IMenuItem extends TextProps {
-  to: string
+interface IMenuItem {
+  to?: string
 }
 
-const MenuItem: React.FC<IMenuItem> = ({ children, to, ...rest }) => {
+const MenuItem: React.FC<IMenuItem> = ({ children, to = '#' }) => {
   return (
     <Link href={to}>
-      <Text fontStyle="normal" {...rest} cursor="pointer">
-        {children}
-      </Text>
+      <Text cursor="pointer">{children}</Text>
     </Link>
   )
 }

@@ -1,11 +1,21 @@
 import React from 'react'
-import { Home, Plus, Search } from 'react-feather'
+import { Home, LogOut, Plus, Search } from 'react-feather'
 
 import { Box, Icon, Stack } from '@chakra-ui/react'
+import { useRouter } from 'next/dist/client/router'
+import { api } from 'src/services/api'
 
 import MenuItem from '../components/MenuItem'
 
 const Sidebar: React.FC = () => {
+  const router = useRouter()
+
+  function handleLogout() {
+    api.delete('/api/logout').then(() => {
+      router.replace('/')
+    })
+  }
+
   return (
     <Box
       py={[3, 10]}
@@ -21,33 +31,48 @@ const Sidebar: React.FC = () => {
     >
       <Stack
         as="nav"
-        spacing={['16', '12']}
-        align={['center', 'flex-start']}
+        spacing="12"
+        alignItems="center"
         direction={['row', 'column']}
         justify={['center', 'flex-start']}
         w={['full', 'min-content']}
         h={['min-content', 'full']}
       >
-        <MenuItem to="/new" as="span">
-          <Icon
-            as={Plus}
-            color="white"
-            boxSize={['7', '7', '7', '7', '7', '10']}
-          />
+        <MenuItem to="/new">
+          <i>
+            <Icon
+              as={Plus}
+              color="white"
+              boxSize={['7', '7', '7', '7', '7', '10']}
+            />
+          </i>
         </MenuItem>
-        <MenuItem to="/search" as="span">
-          <Icon
-            as={Search}
-            color="white"
-            boxSize={['7', '7', '7', '7', '7', '10']}
-          />
+        <MenuItem to="/search">
+          <i>
+            <Icon
+              as={Search}
+              color="white"
+              boxSize={['7', '7', '7', '7', '7', '10']}
+            />
+          </i>
         </MenuItem>
-        <MenuItem to="/dashboard" as="span">
-          <Icon
-            as={Home}
-            color="white"
-            boxSize={['7', '7', '7', '7', '7', '10']}
-          />
+        <MenuItem to="/dashboard">
+          <i>
+            <Icon
+              as={Home}
+              color="white"
+              boxSize={['7', '7', '7', '7', '7', '10']}
+            />
+          </i>
+        </MenuItem>
+        <MenuItem>
+          <i onClick={handleLogout}>
+            <Icon
+              as={LogOut}
+              boxSize={['7', '7', '7', '7', '7', '10']}
+              color="white"
+            />
+          </i>
         </MenuItem>
       </Stack>
     </Box>

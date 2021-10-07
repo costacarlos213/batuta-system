@@ -73,6 +73,7 @@ function Home(): JSX.Element {
               <Mail strokeWidth={1} />
             </InputLeftElement>
             <Input
+              cursor="text"
               h="14"
               isRequired
               _placeholder={{
@@ -96,6 +97,7 @@ function Home(): JSX.Element {
               <Lock strokeWidth={1} />
             </InputLeftElement>
             <Input
+              cursor="text"
               pt="1"
               h="14"
               _placeholder={{
