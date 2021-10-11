@@ -22,9 +22,9 @@ import utc from 'dayjs/plugin/utc'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
+import ModalContent from 'src/components/ExcludeModal'
 import FieldsContainer from 'src/components/FieldsContainer'
 import FileUpload from 'src/components/FileUpload'
-import ModalContent from 'src/components/Modal'
 import { api } from 'src/services/api'
 import { validateFiles } from 'src/utils/validateFiles'
 
@@ -219,7 +219,11 @@ const Order: React.FC = ({
         closeOnOverlayClick
       >
         <ModalOverlay />
-        <ModalContent onClose={onClose} checkedFields={[order]} />
+        <ModalContent
+          onClose={onClose}
+          checkedFields={[order]}
+          title="Você deseja mesmo apagar esse pedido?"
+        />
       </Modal>
       <Flex
         flexDirection={['column', 'row']}

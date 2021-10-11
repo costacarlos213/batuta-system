@@ -6,7 +6,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import router from 'next/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
-import ModalContent from 'src/components/Modal'
+import ModalContent from 'src/components/ExcludeModal'
 import { api } from 'src/services/api'
 import useSWR from 'swr'
 
@@ -77,7 +77,11 @@ const Dashboard: React.FC = ({
         closeOnOverlayClick
       >
         <ModalOverlay />
-        <ModalContent onClose={onClose} checkedFields={checked} />
+        <ModalContent
+          onClose={onClose}
+          checkedFields={checked}
+          title="Você deseja mesmo apagar esse pedido?"
+        />
       </Modal>
       <ButtonGroup
         checkedFields={checked}

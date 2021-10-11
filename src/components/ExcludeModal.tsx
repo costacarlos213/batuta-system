@@ -18,11 +18,13 @@ import { api } from 'src/services/api'
 
 interface IModalFunctions {
   checkedFields?: (IOrder | boolean)[]
+  title: string
   onClose: () => void
 }
 
 const ModalContent: React.FC<IModalFunctions> = ({
   onClose,
+  title,
   checkedFields
 }) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -71,7 +73,7 @@ const ModalContent: React.FC<IModalFunctions> = ({
         <ModalBody zIndex="9999">
           <Stack spacing="10" justifyContent="center" alignItems="center">
             <Text textAlign="center" fontWeight="bold" fontSize="xl">
-              Você deseja mesmo apagar esse pedido?
+              {title}
             </Text>
             <Flex
               flexDirection="row"

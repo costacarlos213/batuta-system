@@ -32,8 +32,8 @@ export interface ITableRow {
 
 interface ITableContent {
   rows: IOrder[]
-  setChecked: React.Dispatch<React.SetStateAction<({ id: string } | boolean)[]>>
-  checked: ({ id: string } | boolean)[]
+  setChecked: React.Dispatch<React.SetStateAction<(IOrder | boolean)[]>>
+  checked: (IOrder | boolean)[]
 }
 
 const DashboardTable: React.FC<ITableContent> = ({

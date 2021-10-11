@@ -5,7 +5,7 @@ import axios from 'axios'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
-import ModalContent from 'src/components/Modal'
+import ModalContent from 'src/components/ExcludeModal'
 import Table from 'src/components/Table'
 import { api } from 'src/services/api'
 
@@ -34,7 +34,11 @@ const Query: React.FC = ({
         closeOnOverlayClick
       >
         <ModalOverlay />
-        <ModalContent onClose={onClose} checkedFields={checked} />
+        <ModalContent
+          onClose={onClose}
+          checkedFields={checked}
+          title="Você deseja mesmo apagar esse pedido?"
+        />
       </Modal>
       <ButtonGroup
         openModal={onOpen}

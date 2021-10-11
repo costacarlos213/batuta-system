@@ -11,11 +11,8 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
   control: provided => ({
     ...provided,
     height: 40,
-    borderTop: 0,
-    borderLeft: 0,
-    borderRight: 0,
-    borderBottomColor: theme.colors.gray[200],
-    borderRadius: 0,
+    borderColor: theme.colors.gray[200],
+    borderRadius: 6,
     width: theme.sizes.full,
     boxShadow: 'none',
     paddingBottom: 1,
@@ -54,7 +51,8 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
   option: (provided, state) => ({
     ...provided,
     color: state.isSelected ? 'white' : theme.colors.gray[500],
-    backgroundColor: state.isSelected ? theme.colors.green[300] : 'white',
+    backgroundColor:
+      state.isSelected || state.isFocused ? theme.colors.green[300] : 'white',
     padding: '10px 20px',
     marginBottom: 4,
     cursor: 'pointer',

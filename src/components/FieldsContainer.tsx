@@ -223,7 +223,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               cursor={disabled ? 'not-allowed' : 'default'}
               placeholder="Valor"
               mb={['5', '0']}
-              variant="flushed"
+              variant="outline"
               type="text"
               _placeholder={{
                 color: 'gray.200'

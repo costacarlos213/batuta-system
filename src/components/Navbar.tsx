@@ -67,7 +67,7 @@ const Navbar: React.FC<FlexProps> = props => {
             <i>
               <Icon as={Plus} color="green.400" boxSize="7" />
             </i>{' '}
-            Novo
+            Novo Pedido
           </Text>
         </MenuItem>
         <MenuItem>

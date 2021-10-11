@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Upload } from 'react-feather'
 import { useFieldArray, useForm } from 'react-hook-form'
 
@@ -129,6 +129,49 @@ const New: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    const pressedKeys: Record<string, boolean> = {}
+    let fieldLength = 1
+
+    function handleKeyDown(event: KeyboardEvent) {
+      pressedKeys[event.key] = true
+
+      if (pressedKeys.Control && pressedKeys['[']) {
+        addNewFormSection()
+
+        fieldLength++
+
+        document.body.removeEventListener('keydown', handleKeyDown)
+      } else if (pressedKeys.Control && pressedKeys.Dead) {
+        if (fieldLength > 1) {
+          remove(fieldLength - 1)
+
+          fieldLength--
+
+          document.body.removeEventListener('keydown', handleKeyDown)
+        }
+      } else if (pressedKeys.Enter && pressedKeys.Control) {
+        onSubmit()
+
+        document.body.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+
+    function handleKeyUp(event: KeyboardEvent) {
+      if (event.key === '=') {
+        delete pressedKeys['§']
+      } else {
+        delete pressedKeys[event.key]
+      }
+
+      document.body.addEventListener('keydown', handleKeyDown)
+    }
+
+    document.body.addEventListener('keydown', handleKeyDown)
+
+    document.body.addEventListener('keyup', handleKeyUp)
+  }, [])
+
   return (
     <Box
       as="main"
@@ -145,7 +188,6 @@ const New: React.FC = () => {
       overflowX={['scroll', 'hidden']}
     >
       <form
-        onSubmit={onSubmit}
         style={{
           height: '100%'
         }}
@@ -292,10 +334,11 @@ const New: React.FC = () => {
           </Button>
           <Button
             disabled={isDisabled}
-            type="submit"
+            type="button"
             fontWeight="semibold"
             fontSize="md"
             backgroundColor="whatsapp.500"
+            onClick={onSubmit}
             px="5"
             color="white"
             _hover={{

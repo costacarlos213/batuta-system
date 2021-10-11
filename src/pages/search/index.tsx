@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Search as SearchIcon } from 'react-feather'
 import { useForm } from 'react-hook-form'
 
@@ -67,6 +67,30 @@ const Search: React.FC = () => {
     }
   })
 
+  useEffect(() => {
+    const pressedKeys: Record<string, boolean> = {}
+
+    function handleKeyDown(event: KeyboardEvent) {
+      pressedKeys[event.key] = true
+
+      if (pressedKeys.Enter && pressedKeys.Control) {
+        onSubmit()
+
+        document.body.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+
+    function handleKeyUp(event: KeyboardEvent) {
+      delete pressedKeys[event.key]
+
+      document.body.addEventListener('keydown', handleKeyDown)
+    }
+
+    document.body.addEventListener('keydown', handleKeyDown)
+
+    document.body.addEventListener('keyup', handleKeyUp)
+  }, [])
+
   const phoneWatch = watch('pedidos.0.phone')
   return (
     <Box
@@ -84,7 +108,6 @@ const Search: React.FC = () => {
       overflowX={['scroll', 'hidden']}
     >
       <form
-        onSubmit={onSubmit}
         style={{
           height: '100%'
         }}
@@ -138,8 +161,9 @@ const Search: React.FC = () => {
         </FieldsContainer>
         <Button
           mb="6"
-          type="submit"
+          type="button"
           fontWeight="semibold"
+          onClick={onSubmit}
           fontSize="md"
           backgroundColor="whatsapp.500"
           px="5"

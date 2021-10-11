@@ -11,12 +11,12 @@ const FormInput: React.FC<IFormInput> = ({ ...rest }) => {
   return (
     <Input
       cursor="text"
-      variant="flushed"
+      variant="outline"
       _placeholder={{
         color: 'gray.200'
       }}
       borderColor="gray.500"
-      paddingLeft="1"
+      paddingLeft="2"
       _hover={{
         borderColor: '#B3B3B3'
       }}
