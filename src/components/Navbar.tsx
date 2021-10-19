@@ -76,6 +76,7 @@ const Navbar: React.FC<FlexProps> = props => {
             fontWeight="medium"
             fontSize={['md', 'md', 'md', 'md', 'xl', '2xl']}
             color="red.400"
+            cursor="pointer"
           >
             Sair
           </Text>

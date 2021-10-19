@@ -9,7 +9,7 @@ const Layout: React.FC = ({ children }) => {
     <Flex h="100vh" w="100vw" flexDirection="column">
       <Navbar display={['none', 'none', 'fixed']} />
       <Flex
-        flexDirection={['column', 'row']}
+        flexDirection={['column', 'column', 'row']}
         w="full"
         h="auto"
         flexGrow={1}

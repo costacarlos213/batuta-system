@@ -18,11 +18,11 @@ const Sidebar: React.FC = () => {
 
   return (
     <Box
-      py={[3, 10]}
+      py={[3, 3, 10]}
       px={[3, 3, 3, 3, 4]}
       bg="green.400"
-      w={['full', 'fit-content']}
-      h={['min', 'full']}
+      w={['full', 'full', 'fit-content']}
+      h={['min', 'min', 'full']}
       as="aside"
       float="left"
       position="sticky"
@@ -33,10 +33,10 @@ const Sidebar: React.FC = () => {
         as="nav"
         spacing="12"
         alignItems="center"
-        direction={['row', 'column']}
-        justify={['center', 'flex-start']}
-        w={['full', 'min-content']}
-        h={['min-content', 'full']}
+        direction={['row', 'row', 'column']}
+        justify={['center', 'center', 'flex-start']}
+        w={['full', 'full', 'min-content']}
+        h={['min-content', 'min-content', 'full']}
       >
         <MenuItem to="/new">
           <i>

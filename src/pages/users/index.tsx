@@ -1,62 +1,30 @@
 import React, { useState } from 'react'
 
-import { Box, ModalOverlay, Modal, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Modal,
+  ModalOverlay,
+  useDisclosure
+} from '@chakra-ui/react'
 import axios from 'axios'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import router from 'next/router'
+import { useRouter } from 'next/dist/client/router'
+import Link from 'next/link'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
-import ButtonGroup from 'src/components/ButtonGroup'
-import ModalContent from 'src/components/ExcludeModal'
+import UsersTable from 'src/components/UsersTable'
 import { api } from 'src/services/api'
-import useSWR from 'swr'
 
-import Table from '../components/Table'
+import ModalContent from '../../components/ExcludeModal'
 
-const Dashboard: React.FC = ({
-  numberOfOrders
+const AllUsers: React.FC = ({
+  users
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [checked, setChecked] = useState(new Array(numberOfOrders).fill(false))
+  const [checked, setChecked] = useState(new Array(users.length).fill(false))
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { data, error } = useSWR(
-    '/api/getOrders',
-    async url => {
-      const { 'dashboard.access-token': token } = parseCookies()
-
-      return api
-        .get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        .then(response => {
-          console.log('Response')
-
-          if (response.data) {
-            if (response.data.message === 'Invalid Session') {
-              router.replace('/')
-            }
-
-            const newLength = response.data.length - numberOfOrders
-
-            for (let i = 0; i < newLength; i++) {
-              setChecked([...checked, false])
-            }
-          }
-
-          return response.data
-        })
-        .catch(error => {
-          if (error.response.status === 401) {
-            router.replace('/')
-          }
-        })
-    },
-    {
-      revalidateOnMount: true,
-      shouldRetryOnError: false
-    }
-  )
+  const router = useRouter()
 
   return (
     <Box
@@ -83,14 +51,40 @@ const Dashboard: React.FC = ({
           title="Você deseja mesmo apagar esse pedido?"
         />
       </Modal>
-      <ButtonGroup
-        checkedFields={checked}
-        printData={data}
-        openModal={onOpen}
-      />
-      {!data && <Table rows={[]} checked={checked} setChecked={setChecked} />}
-      {!data && !error && <p>carregando dados...</p>}
-      {data && <Table rows={data} checked={checked} setChecked={setChecked} />}
+      <Flex flexDirection="row" alignItems="center">
+        <Link href="/users/new">
+          <Button
+            mb="2"
+            fontWeight="semibold"
+            fontSize="md"
+            backgroundColor="whatsapp.500"
+            px="3"
+            color="white"
+            _hover={{
+              backgroundColor: 'whatsapp.400'
+            }}
+          >
+            Novo Vendedor
+          </Button>
+        </Link>
+        <Button
+          onClick={onOpen}
+          px="5"
+          ml="5"
+          mb="2"
+          hidden={!checked.find(item => typeof item !== 'boolean')}
+          fontWeight="semibold"
+          fontSize="sm"
+          color="white"
+          backgroundColor="red.500"
+          _hover={{
+            backgroundColor: 'red.600'
+          }}
+        >
+          Excluir
+        </Button>
+      </Flex>
+      <UsersTable rows={users} checked={checked} setChecked={setChecked} />
     </Box>
   )
 }
@@ -103,7 +97,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   api.defaults.headers.common.Authorization = bearer
 
   return (await axios
-    .get(`${process.env.API_URL}/order/count`, {
+    .get(`${process.env.API_URL}/user`, {
       headers: {
         Authorization: bearer
       }
@@ -111,7 +105,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     .then(resp => {
       return {
         props: {
-          numberOfOrders: resp.data.quantity
+          users: resp.data
         }
       }
     })
@@ -138,8 +132,8 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
           api.defaults.headers.common.Authorization = newbearer
 
-          const numberOfOrders = await axios.get(
-            `${process.env.API_URL}/order/count`,
+          const getUsersResponse = await axios.get(
+            `${process.env.API_URL}/user`,
             {
               headers: {
                 Authorization: newbearer
@@ -149,7 +143,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
           return {
             props: {
-              numberOfOrders: numberOfOrders.data.quantity
+              users: getUsersResponse.data
             }
           }
         } catch (error) {
@@ -171,4 +165,4 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     /* eslint-enable */
 }
 
-export default Dashboard
+export default AllUsers

@@ -26,6 +26,8 @@ const New: React.FC = () => {
   const [isDisabled, setDisabled] = useState(false)
   const [error, setError] = useState<null | string>(null)
 
+  let fieldLength = 1
+
   const { register, handleSubmit, formState, control, watch } =
     useForm<UseFormType>({
       defaultValues: {
@@ -39,7 +41,7 @@ const New: React.FC = () => {
             file_: undefined,
             payment: '',
             phone: '',
-            total: 0,
+            total: undefined,
             comments: '',
             color: 'green',
             title: '',
@@ -108,10 +110,14 @@ const New: React.FC = () => {
   })
 
   function removeFormSection(index: number) {
+    fieldLength--
+
     remove(index)
   }
 
   function addNewFormSection() {
+    fieldLength++
+
     append({
       cod: '',
       address: '',
@@ -121,7 +127,7 @@ const New: React.FC = () => {
       file_: undefined,
       payment: '',
       phone: '',
-      total: 0,
+      total: undefined,
       vendor: '',
       color: 'green',
       title: '',
@@ -131,7 +137,6 @@ const New: React.FC = () => {
 
   useEffect(() => {
     const pressedKeys: Record<string, boolean> = {}
-    let fieldLength = 1
 
     function handleKeyDown(event: KeyboardEvent) {
       pressedKeys[event.key] = true
@@ -175,17 +180,17 @@ const New: React.FC = () => {
   return (
     <Box
       as="main"
-      ml={['0', '2']}
+      ml={['0', '0', '2']}
       bg="white"
       display="flex"
       flexDirection="column"
       w="full"
-      mt={['2', '0']}
-      pt={['3', '5']}
-      pl={['5', '10']}
+      mt={['2', '2', '0']}
+      pt={['3', '3', '5']}
+      pl={['5', '5', '10']}
       pr="5"
-      justifyContent={['center', 'flex-start']}
-      overflowX={['scroll', 'hidden']}
+      justifyContent={['center', 'center', 'flex-start']}
+      overflowX={['scroll', 'scroll', 'hidden']}
     >
       <form
         style={{
@@ -200,6 +205,7 @@ const New: React.FC = () => {
         {fields.map((field, index) => {
           const phoneWatch = watch(`pedidos.${index}.phone`)
           const titleWatch = watch(`pedidos.${index}.title`)
+          const descWatch = watch(`pedidos.${index}.description`)
 
           if (fields.length === index + 1) {
             return (
@@ -210,6 +216,7 @@ const New: React.FC = () => {
                 disabled={isDisabled}
                 key={field.id}
                 phoneWatch={phoneWatch}
+                descWatch={descWatch}
                 register={register}
                 index={index}
                 formState={formState}
@@ -220,8 +227,8 @@ const New: React.FC = () => {
                   placeholder="Observações"
                   resize="none"
                   size="md"
-                  h={['unset', '32']}
-                  w={['full', 'xl']}
+                  h={['unset', 'unset', '32']}
+                  w={['full', 'full', 'xl']}
                   _placeholder={{
                     color: 'gray.200'
                   }}
@@ -231,6 +238,11 @@ const New: React.FC = () => {
                   }}
                   _focus={{
                     shadow: 0
+                  }}
+                  sx={{
+                    '&:placeholder-shown': {
+                      bgColor: '#d2d2d2'
+                    }
                   }}
                   {...register(`pedidos.${index}.comments`, {
                     required: false,
@@ -254,6 +266,7 @@ const New: React.FC = () => {
                 handleRemove={index !== 0 ? removeFormSection : undefined}
                 control={control}
                 disabled={isDisabled}
+                descWatch={descWatch}
                 index={index}
                 key={field.id}
                 register={register}
@@ -266,8 +279,8 @@ const New: React.FC = () => {
                   placeholder="Observações"
                   resize="none"
                   size="md"
-                  h={['unset', '32']}
-                  w={['full', 'xl']}
+                  h={['unset', 'unset', '32']}
+                  w={['full', 'full', 'xl']}
                   _placeholder={{
                     color: 'gray.200'
                   }}
@@ -277,6 +290,11 @@ const New: React.FC = () => {
                   }}
                   _focus={{
                     shadow: 0
+                  }}
+                  sx={{
+                    '&:placeholder-shown': {
+                      bgColor: '#d2d2d2'
+                    }
                   }}
                   {...register(`pedidos.${index}.comments`, {
                     required: false,

@@ -8,7 +8,7 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
     zIndex: 9999
   }),
 
-  control: provided => ({
+  control: (provided, state) => ({
     ...provided,
     height: 40,
     borderColor: theme.colors.gray[200],
@@ -18,7 +18,8 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
     paddingBottom: 1,
     ':hover': {
       borderColor: '#B3B3B3'
-    }
+    },
+    backgroundColor: state.hasValue ? 'white' : '#d2d2d2'
   }),
 
   container: provided => ({
@@ -30,7 +31,6 @@ const customStyles: StylesConfig<OptionTypeBase, false> = {
 
   placeholder: provided => ({
     ...provided,
-    height: '1.2rem',
     color: theme.colors.gray[200],
     fontWeight: 'normal'
   }),

@@ -1,42 +1,52 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Control, Controller, UseFormRegisterReturn } from 'react-hook-form'
-import { OptionTypeBase } from 'react-select'
-import Select from 'react-select/creatable'
+import Select, { OptionTypeBase } from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 
 import { Box } from '@chakra-ui/layout'
 import { customStyles } from 'src/styles/select'
-
-import { UseFormType } from '../../@types/pedidos'
 
 interface IReactSelect {
   placeholder?: string
   mr?: string | string[]
   ml?: string | string[]
-  defaultOptions?: OptionTypeBase[]
+  defaultOptions: OptionTypeBase[]
   defaultValue?: string
   disabled?: boolean
   width?: string | string[]
+  descWatch?: string
+  creatable?: boolean
   /* eslint-disable */
-  control?: Control<UseFormType, object>
+  control?: Control<any, object>
   /* eslint-enable */
 }
 
 const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
   placeholder = '',
   disabled = false,
+  creatable = true,
   defaultOptions,
   defaultValue,
+  descWatch,
   ml,
   mr,
   width = 'full',
   control,
   name
 }) => {
+  let hasDefaultValue = false
+
+  if (defaultValue) {
+    hasDefaultValue = true
+  }
+
+  const boxRef = useRef<HTMLDivElement>(null)
   const [options, setOptions] = useState<OptionTypeBase[]>(defaultOptions || [])
-  const [selectValue, setValue] = useState<OptionTypeBase>({
-    label: defaultValue || placeholder,
-    value: defaultValue || placeholder
-  })
+  const [selectValue, setValue] = useState<OptionTypeBase | null>(
+    hasDefaultValue === true
+      ? { label: defaultValue, value: defaultValue }
+      : null
+  )
 
   function capitalizeFirstLetter(value: string) {
     const lowerCase = value.toLowerCase()
@@ -54,8 +64,6 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
         label: capitalizeFirstLetter(placeholder),
         value: capitalizeFirstLetter(placeholder)
       })
-
-      console.log()
     } else if (actionMeta.action === 'select-option') {
       setValue({
         label: newValue.label,
@@ -74,6 +82,16 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
     setOptions([...options, newOption])
   }
 
+  useEffect(() => {
+    if (descWatch) {
+      boxRef.current?.click()
+    }
+  }, [descWatch])
+
+  useEffect(() => {
+    setOptions(defaultOptions)
+  }, [defaultOptions])
+
   return (
     <Controller
       control={control}
@@ -83,25 +101,64 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
       /* eslint-enable */
       render={({ field: { onChange, ...rest } }) => (
         <Box width={width} mr={mr} ml={ml}>
-          <Select
-            isDisabled={disabled}
-            styles={customStyles}
-            isClearable={!disabled}
-            isSearchable
-            onCreateOption={value => {
-              const capitalizedValue = capitalizeFirstLetter(value)
-              onChange(capitalizedValue)
-              handleCreate(capitalizedValue)
+          <Box
+            display="none"
+            pointerEvents="none"
+            ref={boxRef}
+            onClick={() => {
+              if (descWatch) {
+                if (descWatch.endsWith('3 metros')) {
+                  onChange('Kit Grande')
+                  setValue({
+                    label: 'Kit Grande',
+                    value: 'Kit Grande'
+                  })
+                } else {
+                  onChange('Kit Pequeno')
+                  setValue({
+                    label: 'Kit Pequeno',
+                    value: 'Kit Pequeno'
+                  })
+                }
+              }
             }}
-            options={options}
-            placeholder={placeholder}
-            onChange={(value, actionMeta) => {
-              onChange(value?.value || '')
-              handleChange(value, actionMeta)
-            }}
-            {...rest}
-            value={selectValue}
           />
+          {creatable ? (
+            <CreatableSelect
+              isDisabled={disabled}
+              styles={customStyles}
+              isClearable={!disabled}
+              isSearchable
+              onCreateOption={value => {
+                const capitalizedValue = capitalizeFirstLetter(value)
+                onChange(capitalizedValue)
+                handleCreate(capitalizedValue)
+              }}
+              options={options}
+              placeholder={placeholder}
+              onChange={(value, actionMeta) => {
+                onChange(value?.value || '')
+                handleChange(value, actionMeta)
+              }}
+              {...rest}
+              value={selectValue}
+            />
+          ) : (
+            <Select
+              isDisabled={disabled}
+              styles={customStyles}
+              isClearable={!disabled}
+              isSearchable
+              options={options}
+              placeholder={placeholder}
+              onChange={(value, actionMeta) => {
+                onChange(value?.value || '')
+                handleChange(value, actionMeta)
+              }}
+              {...rest}
+              value={selectValue}
+            />
+          )}
         </Box>
       )}
     />

@@ -19,17 +19,6 @@ import { IOrder } from 'src/pages/order/[id]'
 dayjs.extend(utc)
 dayjs.extend(tz)
 
-export interface ITableRow {
-  id: string
-  cod: string
-  date: string
-  customerName: string
-  vendor: string
-  description: string
-  total: string
-  delivery: string
-}
-
 interface ITableContent {
   rows: IOrder[]
   setChecked: React.Dispatch<React.SetStateAction<(IOrder | boolean)[]>>

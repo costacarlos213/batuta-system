@@ -6,6 +6,7 @@ import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import Layout from 'src/components/Layout'
 import { AuthProvider } from 'src/context/AuthContext'
+import { NamesProvider } from 'src/context/NamesContext'
 
 import theme, { scrollBarStyles } from '../styles/globals'
 
@@ -22,7 +23,7 @@ const MyApp = ({
   pageProps,
   router
 }: AppPropsWithLayout): ReactNode => {
-  if (router.pathname === '/' || router.pathname === '/simple') {
+  if (router.pathname === '/') {
     return (
       <AuthProvider>
         <ChakraProvider resetCSS theme={theme}>
@@ -35,12 +36,14 @@ const MyApp = ({
 
   return (
     <AuthProvider>
-      <ChakraProvider resetCSS theme={theme}>
-        <Global styles={scrollBarStyles} />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ChakraProvider>
+      <NamesProvider>
+        <ChakraProvider resetCSS theme={theme}>
+          <Global styles={scrollBarStyles} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ChakraProvider>
+      </NamesProvider>
     </AuthProvider>
   )
 }

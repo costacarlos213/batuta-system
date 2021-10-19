@@ -18,13 +18,13 @@ const Query: React.FC = ({
   return (
     <Box
       as="main"
-      ml={['0', '2']}
+      ml={['0', '0', '2']}
       bg="white"
       display="block"
       w="full"
-      mt={['2', '0']}
-      p={['3', '5']}
-      overflowX={['scroll', 'hidden']}
+      mt={['2', '2', '0']}
+      p={['3', '3', '5']}
+      overflowX={['scroll', 'scroll', 'hidden']}
     >
       <Modal
         isOpen={isOpen}

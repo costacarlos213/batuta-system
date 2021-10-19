@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { X } from 'react-feather'
 import { Control, FormState, UseFormRegister } from 'react-hook-form'
 import MaskInput from 'react-input-mask'
@@ -15,7 +15,9 @@ import {
   Text
 } from '@chakra-ui/react'
 import ChakraReactSelect from 'src/components/ChakraReactSelect'
+import { NamesContext } from 'src/context/NamesContext'
 import { IOrder } from 'src/pages/order/[id]'
+import useSWR from 'swr'
 
 import { UseFormType } from '../../@types/pedidos'
 import Input from '../components/FormInput'
@@ -31,6 +33,7 @@ interface IFieldsContainer {
   disabled?: boolean
   phoneWatch: string
   titleWatch?: string
+  descWatch?: string
   /* eslint-disable */
   control?: Control<UseFormType, object>
   /* eslint-enable */
@@ -43,6 +46,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
   disabled = false,
   phoneWatch,
   titleWatch,
+  descWatch,
   index,
   control,
   handleRemove,
@@ -58,6 +62,9 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
     }
   }
   const [maskValue, setMaskValue] = useState(initialPhoneMask)
+  const { users, fetchNames } = useContext(NamesContext)
+
+  useSWR('/api/getNames', () => fetchNames(), { revalidateOnFocus: false })
 
   useEffect(() => {
     if (phoneWatch?.length > 14) {
@@ -67,15 +74,15 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
     }
   }, [phoneWatch])
 
-  const vendorOptions = [
-    { label: 'Camilla', value: 'Camilla' },
-    { label: 'Jéssica', value: 'Jessica' },
-    { label: 'Renata', value: 'Renata' },
-    { label: 'Laildon', value: 'Laildon' },
-    { label: 'Ester', value: 'Ester' },
-    { label: 'Geovane', value: 'Geovane' },
-    { label: 'Dougllas', value: 'Dougllas' }
-  ]
+  // const vendorOptions = [
+  //   { label: 'Camilla', value: 'Camilla' },
+  //   { label: 'Jéssica', value: 'Jessica' },
+  //   { label: 'Renata', value: 'Renata' },
+  //   { label: 'Laildon', value: 'Laildon' },
+  //   { label: 'Ester', value: 'Ester' },
+  //   { label: 'Geovane', value: 'Geovane' },
+  //   { label: 'Dougllas', value: 'Dougllas' }
+  // ]
 
   const descOptions = [
     { label: 'Kit bandeira 2 metros', value: 'Kit bandeira 2 metros' },
@@ -126,25 +133,13 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
       borderColor="#dfdfdf"
       pb="6"
     >
-      <ChakraReactSelect
-        mr={['0', '6']}
-        disabled={disabled}
-        control={control}
-        width={['full', 'sm']}
-        placeholder="Vendedor"
-        defaultValue={defaultValues?.vendor}
-        defaultOptions={vendorOptions}
-        {...register(`pedidos.${index}.vendor`, {
-          maxLength: 250,
-          required: false
-        })}
-      />
-      <Stack spacing="5" width={['full', 'xl', 'xl', '2xl', '4xl']}>
+      <Stack spacing="5" width={['full', 'full', '2xl', '4xl']}>
         <Flex
           flexDirection="row"
           w="full"
-          justifyContent="flex-end"
-          position="absolute"
+          justifyContent={['center', 'flex-end']}
+          position={['relative', 'absolute']}
+          mb="-2"
           alignItems="center"
         >
           {handleRemove && (
@@ -162,18 +157,27 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
             </Button>
           )}
         </Flex>
-        <Stack
-          alignItems="center"
-          direction={['column', 'row']}
-          spacing={['0', '10']}
-        >
+        <ChakraReactSelect
+          mr={['0', '0', '6']}
+          disabled={disabled}
+          control={control}
+          width={['full', 'full', 'xs', 'sm']}
+          placeholder="Vendedor"
+          defaultValue={defaultValues?.vendor}
+          defaultOptions={users}
+          {...register(`pedidos.${index}.vendor`, {
+            maxLength: 250,
+            required: false
+          })}
+        />
+        <Flex direction={['column', 'column', 'row']} width="full">
           <Input
             defaultValue={defaultValues?.customerName}
             cursor={disabled ? 'not-allowed' : 'default'}
             placeholder="Nome do cliente"
-            width={['full', '3xl']}
-            mr={['0', '6']}
-            mb={['5', '0']}
+            width={['full', 'full', '3xl']}
+            mr={['0', '0', '16']}
+            mb={['5', '5', '0']}
             {...register(`pedidos.${index}.customerName`, {
               maxLength: 250,
               required: false
@@ -195,12 +199,12 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
               pattern: /(\(?\d{2}\)?\s)?(\d{4,5}-\d{4})/g
             })}
           />
-        </Stack>
+        </Flex>
         <ChakraReactSelect
           control={control}
           disabled={disabled}
           placeholder="Descrição do produto"
-          width={['full', '3xl']}
+          width="full"
           defaultOptions={descOptions}
           defaultValue={defaultValues?.description}
           {...register(`pedidos.${index}.description`, {
@@ -209,20 +213,21 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           })}
         />
 
-        <Stack
-          alignItems="center"
-          direction={['column', 'row']}
-          spacing={['0', '10']}
-        >
-          <InputGroup mr={['0', '6']}>
+        <Flex direction={['column', 'column', 'row']} alignItems="center">
+          <InputGroup mr={['0', '0', '16']} width={['full', 'full', '3xl']}>
             <InputLeftElement pointerEvents="none" color="gray.200">
               R$
             </InputLeftElement>
             <ChakraInput
+              sx={{
+                '&:placeholder-shown': {
+                  bgColor: '#d2d2d2'
+                }
+              }}
               defaultValue={defaultValues?.total}
               cursor={disabled ? 'not-allowed' : 'default'}
               placeholder="Valor"
-              mb={['5', '0']}
+              mb={['5', '5', '0']}
               variant="outline"
               type="text"
               _placeholder={{
@@ -245,20 +250,21 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
             defaultValue={defaultValues?.payment}
             control={control}
             defaultOptions={paymentOptions}
-            width={['full', '5xl']}
+            width="full"
             placeholder="Forma de pagamento"
             {...register(`pedidos.${index}.payment`, {
               required: false,
               maxLength: 250
             })}
           />
-        </Stack>
+        </Flex>
         <ChakraReactSelect
           defaultValue={defaultValues?.title}
           defaultOptions={titleOptions}
           control={control}
           disabled={disabled}
-          width={['full', 'sm']}
+          descWatch={descWatch}
+          width={['full', 'full', 'xs', 'sm']}
           placeholder="Resumo do pedido"
           {...register(`pedidos.${index}.title`, {
             required: false,
@@ -287,7 +293,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           disabled={disabled}
           defaultOptions={deliveryOptions}
           control={control}
-          width={['full', 'sm']}
+          width={['full', 'full', 'xs', 'sm']}
           placeholder="Forma de entrega"
           {...register(`pedidos.${index}.delivery`, {
             required: false,

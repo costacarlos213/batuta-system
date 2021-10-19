@@ -23,6 +23,11 @@ const FormInput: React.FC<IFormInput> = ({ ...rest }) => {
       _focus={{
         shadow: 0
       }}
+      sx={{
+        '&:placeholder-shown': {
+          bgColor: '#d2d2d2'
+        }
+      }}
       {...rest}
     />
   )

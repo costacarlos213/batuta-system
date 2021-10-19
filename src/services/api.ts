@@ -4,7 +4,7 @@ import { destroyCookie, setCookie } from 'nookies'
 
 const api = axios.create({
   withCredentials: true,
-  baseURL: 'https://biruta-wind-system.vercel.app'
+  baseURL: process.env.BASE_URL
 })
 
 createAuthRefreshInterceptor(api, error =>

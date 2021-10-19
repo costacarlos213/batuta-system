@@ -28,43 +28,21 @@ import FileUpload from 'src/components/FileUpload'
 import { api } from 'src/services/api'
 import { validateFiles } from 'src/utils/validateFiles'
 
-import { FormValues, UseFormType } from '../../../@types/pedidos'
+import { IFormValues } from '../../../@types/vendor'
 import Input from '../../components/FormInput'
 
-export interface IOrder {
-  address: string
-  cod: string
-  color: 'green' | 'yellow'
-  title: string
-  comments: string
-  customerName: string
-  date: string
-  delivery: string
-  description: string
-  fileNames: string[]
-  id: string
-  payment: string
-  phone: string
-  total: string
-  vendor: string
-}
-
-dayjs.extend(utc)
-dayjs.extend(tz)
-
-const Order: React.FC = ({
+const Vendor: React.FC = ({
   order
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isDisabled, setIsDisabled] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
-  const [files, setFiles] = useState<File[]>()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const router = useRouter()
 
   const { register, handleSubmit, control, watch, formState } =
-    useForm<UseFormType>({
+    useForm<IFormValues>({
       defaultValues: {
         pedidos: [
           {
@@ -494,4 +472,4 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
     /* eslint-enable */
 }
 
-export default Order
+export default Vendor

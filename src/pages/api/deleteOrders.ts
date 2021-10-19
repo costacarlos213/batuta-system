@@ -5,8 +5,6 @@ const DeleteOrders = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse> => {
-  console.log('deleting...')
-
   const { headers, body } = req
   try {
     const response = await axios.delete(`${process.env.API_URL}/order`, {

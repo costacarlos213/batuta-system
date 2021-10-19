@@ -95,17 +95,17 @@ const Search: React.FC = () => {
   return (
     <Box
       as="main"
-      ml={['0', '2']}
+      ml={['0', '0', '2']}
       bg="white"
       display="flex"
       flexDirection="column"
       w="full"
-      mt={['2', '0']}
-      pt={['3', '5']}
-      pl={['5', '10']}
+      mt={['2', '2', '0']}
+      pt={['3', '3', '5']}
+      pl={['5', '5', '10']}
       pr="5"
-      justifyContent={['center', 'flex-start']}
-      overflowX={['scroll', 'hidden']}
+      justifyContent={['center', 'center', 'flex-start']}
+      overflowX={['scroll', 'scroll', 'hidden']}
     >
       <form
         style={{
@@ -122,7 +122,7 @@ const Search: React.FC = () => {
           _disabled={{
             color: 'gray.200'
           }}
-          width={['full', 'sm']}
+          width={['full', 'full', 'sm']}
           mb="4"
           {...register('pedidos.0.cod', {
             minLength: 4,
@@ -139,22 +139,22 @@ const Search: React.FC = () => {
           border={false}
         >
           <Stack
-            direction={['column', 'row']}
-            alignItems={['center', 'flex-end']}
-            spacing={['2', '5']}
+            direction={['column', 'column', 'row']}
+            alignItems={['center', 'center', 'flex-end']}
+            spacing={['2', '2', '5']}
             justifyContent={['center', 'flex-start']}
           >
             <Input
               placeholder="Data inicial"
               type="date"
-              width={['full', '2xs']}
+              width={['full', 'full', '2xs']}
               {...register('pedidos.0.initialDate')}
             />
             <Text>Até</Text>
             <Input
               placeholder="Data Final"
               type="date"
-              width={['full', '2xs']}
+              width={['full', 'full', '2xs']}
               {...register('pedidos.0.finalDate')}
             />
           </Stack>
