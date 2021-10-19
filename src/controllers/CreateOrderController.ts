@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { CreateOrderUseCase } from "src/useCases/createOrder/CreateOrderUseCase"
+import { CreateOrderUseCase } from "../useCases/createOrder/CreateOrderUseCase"
 
 export class CreateOrderController {
   constructor(private createOrderUseCase: CreateOrderUseCase) {}
@@ -8,12 +8,16 @@ export class CreateOrderController {
     const orderData = req.body.orders
 
     if (!orderData) {
+      console.log("missing data")
+
       return res.status(400).json({
         message: "Missing Data"
       })
     }
 
     try {
+      console.log("Creating...")
+
       await this.createOrderUseCase.execute({
         ...orderData,
         files: req.files

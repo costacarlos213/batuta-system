@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
-import { LoginUseCase } from "src/useCases/login/LoginUseCase"
-import { ILoginDTO } from "src/useCases/login/LoginUseCaseDTO"
+import { LoginUseCase } from "../useCases/login/LoginUseCase"
+import { ILoginDTO } from "../useCases/login/LoginUseCaseDTO"
 
 export class LoginController {
   constructor(private loginUseCase: LoginUseCase) {}

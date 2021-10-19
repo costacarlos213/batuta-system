@@ -11,19 +11,19 @@ export class Order {
   public readonly Date: string
 
   private constructor(
-    public readonly Vendor: StringType,
     public readonly Cod: Code,
-    public readonly CustomerName: StringType,
-    public readonly Description: string,
-    public readonly Total: number,
-    public readonly Delivery: StringType,
-    public readonly Payment: StringType,
-    public readonly Address: Address,
-    public readonly Phone: Phone,
-    public readonly Files: IFilesInfo,
-    public readonly Color: AllowedColors,
-    public readonly Title: StringType,
-    public readonly Comments?: string,
+    public readonly Comments: string = "",
+    public readonly Vendor?: StringType,
+    public readonly CustomerName?: StringType,
+    public readonly Description?: string,
+    public readonly Total?: number,
+    public readonly Delivery?: StringType,
+    public readonly Payment?: StringType,
+    public readonly Address?: Address,
+    public readonly Phone?: Phone,
+    public readonly Files?: IFilesInfo,
+    public readonly Color?: AllowedColors,
+    public readonly Title?: StringType,
     date?: string,
     id?: ObjectId
   ) {
@@ -63,22 +63,23 @@ export class Order {
       files
     } = orderData
 
-    if (description.trim().length < 2 || description.trim().length > 250) {
+    if (description?.trim().length > 250) {
       throw new Error("Invalid description")
     }
 
-    const formatedCustomerName = StringType.create(customerName.trim())
-    const formatedDelivery = StringType.create(delivery.trim())
-    const formatedVendor = StringType.create(vendor.trim())
-    const formatedAddress = Address.create(address.trim())
-    const formatedPayment = StringType.create(payment.trim())
-    const formatedTitle = StringType.create(title.trim())
-    const formatedPhone = Phone.create(phone.trim())
-    const formatedCode = Code.create(cod.trim())
+    const formatedCustomerName = StringType.create(customerName?.trim())
+    const formatedDelivery = StringType.create(delivery?.trim())
+    const formatedVendor = StringType.create(vendor?.trim())
+    const formatedAddress = Address.create(address?.trim())
+    const formatedPayment = StringType.create(payment?.trim())
+    const formatedTitle = StringType.create(title?.trim())
+    const formatedPhone = Phone.create(phone?.trim())
+    const formatedCode = Code.create(cod?.trim())
 
     return new Order(
-      formatedVendor,
       formatedCode,
+      comments,
+      formatedVendor,
       formatedCustomerName,
       description,
       total,
@@ -89,8 +90,7 @@ export class Order {
       files,
       color,
       formatedTitle,
-      comments,
-      date,
+      dayjs(date).toISOString(),
       id
     )
   }

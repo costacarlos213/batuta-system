@@ -1,6 +1,6 @@
 import { ObjectId } from "bson"
-import { Order } from "src/entities/Order/Order"
-import { IOrderRepository } from "src/repositories/orderRepository/IOrderRepository"
+import { Order } from "../../entities/Order/Order"
+import { IOrderRepository } from "../../repositories/orderRepository/IOrderRepository"
 import { IUpdateOrderDTO } from "./UpdateOrderUseCaseDTO"
 import { Order as PrismaOrder } from "@prisma/client"
 
@@ -8,6 +8,8 @@ export class UpdateOrderUseCase {
   constructor(private orderRepository: IOrderRepository) {}
 
   async execute(orderData: IUpdateOrderDTO): Promise<void> {
+    console.log(orderData)
+
     if (!orderData.id) {
       throw new Error("Missing order ID")
     }
@@ -17,55 +19,53 @@ export class UpdateOrderUseCase {
     )
 
     const id = new ObjectId(orderData.id)
+    console.log(orderData.deletedFiles)
 
     const fileKeys = [...oldOrder.fileNames]
     const fileUrls = [...oldOrder.fileKeys]
+    const fileSizes = [...oldOrder.fileSizes]
+    const removedIndexes = []
 
     orderData.insertedFiles.forEach(insertedFile => {
       fileKeys.push(insertedFile.key)
       fileUrls.push(insertedFile.location)
+      fileSizes.push(insertedFile.size)
     })
 
-    const filteredFileKeys = await fileKeys.filter(fileKey => {
-      if (orderData.deletedFiles.length === 0) {
-        return true
-      }
+    if (orderData.deletedFiles.length !== 0) {
+      for (let i = 0; i < fileKeys.length; i++) {
+        const wasDeleted = orderData.deletedFiles.find(
+          deletedFile => deletedFile === fileKeys[i]
+        )
 
-      const findDeleted = orderData.deletedFiles.find(
-        deletedFile => deletedFile === fileKey
-      )
-
-      if (!findDeleted) {
-        return true
-      } else {
-        return false
+        if (wasDeleted) {
+          removedIndexes.push(i)
+        }
       }
+    }
+
+    removedIndexes.forEach(index => {
+      fileKeys.splice(index, 1)
+      fileUrls.splice(index, 1)
+      fileSizes.splice(index, 1)
     })
 
-    const filteredFileUrls = await fileUrls.filter(fileUrl => {
-      if (orderData.deletedFiles.length === 0) {
-        return true
-      }
+    let total = orderData.total
 
-      const findDeleted = orderData.deletedFiles.find(
-        deletedFile => deletedFile === fileUrl.split("/")[3].replace("%40", "@")
-      )
-
-      if (!findDeleted) {
-        return true
-      } else {
-        return false
-      }
-    })
+    if (total === "" || !total || total.length === 0) {
+      total = "0"
+    }
 
     const order = Order.create({
-      ...oldOrder,
       ...orderData,
-      total: parseFloat(orderData.total) || oldOrder.total,
+      date: orderData.date || oldOrder.date,
+      vendor: orderData.vendor || oldOrder.vendor,
+      total: parseFloat(total),
       id,
       files: {
-        fileKeys: filteredFileKeys,
-        fileUrls: filteredFileUrls
+        fileKeys,
+        fileUrls,
+        fileSizes
       }
     })
 

@@ -10,6 +10,7 @@ export class PrintSimpleController {
         message: "Missing params."
       })
     }
+    console.log("printing...")
 
     try {
       const pdf = await this.printSimpleUseCase.execute({
@@ -21,7 +22,9 @@ export class PrintSimpleController {
 
       return res.send(pdf)
     } catch (error) {
-      res.status(500).json({
+      console.log(error.message)
+
+      return res.status(500).json({
         message: error.message
       })
     }

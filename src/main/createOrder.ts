@@ -1,7 +1,7 @@
-import { CreateOrderController } from "src/controllers/CreateOrderController"
-import { OrderRepository } from "src/repositories/orderRepository/implementation/OrderRepository"
-import { TokenRepository } from "src/repositories/tokenRepository/implementation/TokenRepository"
-import { CreateOrderUseCase } from "src/useCases/createOrder/CreateOrderUseCase"
+import { CreateOrderController } from "../controllers/CreateOrderController"
+import { OrderRepository } from "../repositories/orderRepository/implementation/OrderRepository"
+import { TokenRepository } from "../repositories/tokenRepository/implementation/TokenRepository"
+import { CreateOrderUseCase } from "../useCases/createOrder/CreateOrderUseCase"
 
 function createOrderControllerFactory() {
   const orderRepository = new OrderRepository()

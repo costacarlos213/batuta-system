@@ -24,7 +24,7 @@ const storageTypes = {
       },
       region: process.env.AWS_DEFAULT_REGION
     }),
-    bucket: "multers3jilhos",
+    bucket: process.env.AWS_BUCKET,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
     key: (req, file, cb) => {

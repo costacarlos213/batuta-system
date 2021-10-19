@@ -1,7 +1,7 @@
 import {
   IOrderId,
   IOrderRepository
-} from "src/repositories/orderRepository/IOrderRepository"
+} from "../../repositories/orderRepository/IOrderRepository"
 
 export class DeleteOrderUseCase {
   constructor(private orderRepository: IOrderRepository) {}

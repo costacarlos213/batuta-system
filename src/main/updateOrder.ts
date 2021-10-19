@@ -1,6 +1,6 @@
-import { UpdateOrderController } from "src/controllers/UpdateOrderController"
-import { OrderRepository } from "src/repositories/orderRepository/implementation/OrderRepository"
-import { UpdateOrderUseCase } from "src/useCases/updateOrder/UpdateOrderUseCase"
+import { UpdateOrderController } from "../controllers/UpdateOrderController"
+import { OrderRepository } from "../repositories/orderRepository/implementation/OrderRepository"
+import { UpdateOrderUseCase } from "../useCases/updateOrder/UpdateOrderUseCase"
 
 function updateOrderControllerFactory() {
   const orderRepository = new OrderRepository()

@@ -1,7 +1,7 @@
-import { LoginController } from "src/controllers/LoginController"
-import { TokenRepository } from "src/repositories/tokenRepository/implementation/TokenRepository"
-import { VendorRepository } from "src/repositories/userRepository/implementation/VendorRepository"
-import { LoginUseCase } from "src/useCases/login/LoginUseCase"
+import { LoginController } from "../controllers/LoginController"
+import { TokenRepository } from "../repositories/tokenRepository/implementation/TokenRepository"
+import { VendorRepository } from "../repositories/userRepository/implementation/VendorRepository"
+import { LoginUseCase } from "../useCases/login/LoginUseCase"
 
 function loginControllerFactory() {
   const vendorRepository = new VendorRepository()

@@ -2,6 +2,10 @@ export class StringType {
   private constructor(private readonly _name: string) {}
 
   static create(name: string): StringType {
+    if (!name || name.length === 0 || name === "undefined") {
+      return new StringType("")
+    }
+
     const isValid = this.validate(name)
 
     if (!isValid) throw new Error("Invalid String")
@@ -19,14 +23,6 @@ export class StringType {
   }
 
   private static validate(name: string): boolean {
-    if (!name) {
-      return false
-    }
-
-    if (typeof name !== "string") {
-      return false
-    }
-
     const trimmedName = name.trim()
 
     if (trimmedName.length < 2 || trimmedName.length > 255) {

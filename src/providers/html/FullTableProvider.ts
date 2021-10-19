@@ -1,4 +1,10 @@
-import { FullTableContent } from "src/@types/table"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+import { FullTableContent } from "../../@types/table"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 export function generateFullTable(tableContent: FullTableContent): string {
   const articles: string[] = []
@@ -14,16 +20,37 @@ export function generateFullTable(tableContent: FullTableContent): string {
     const phone = formatPhone(table.phone)
 
     let images = ""
+    const numberOfImages = table.fileKeys.length
 
     table.fileKeys.forEach(fileName => {
-      images += `<div class="flexChildren"><img src="${fileName}"/></div>`
+      const dividedNumber = Math.round(440 / numberOfImages) - 2
+
+      if (table.fileKeys.length > 1) {
+        images += `<div class="flexChildren" style="width: ${dividedNumber}px;"><img class="rotatedImage" src="${fileName}" style="height: ${dividedNumber}px;" /></div>`
+      } else {
+        images += `<img src="${fileName}"/>`
+      }
     })
+
+    let total: string
+
+    if (!table.total) {
+      total = "0"
+    } else {
+      total = table.total.toString()
+    }
+
+    if (total === "" || total.length === 0) {
+      total = "0"
+    }
 
     return articles.push(`
       <article>
       <table>
         <thead>
-          <th colspan="3" style="background-color: ${table.color};">
+          <th colspan="3" style="background-color: ${
+            table.color !== "green" || !table.color ? "#A9A9A9" : "yellow"
+          };">
             <h1>
               ${table.title.toUpperCase()}
             </h1>
@@ -37,8 +64,20 @@ export function generateFullTable(tableContent: FullTableContent): string {
             <td class="tbodyColumn">
               ${table.cod}
             </td>
-            <td id="imgCell" rowspan="8">
-              <div class="flex">${images}</div>
+            <td id="imgCell" rowspan="10">
+              <div class="flex" style="justify-content: flex-start;">${images}</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="tbodyColumn">
+              Data
+            </td>
+            <td class="tbodyColumn">
+              ${dayjs
+                .utc(table.date)
+                .tz("America/Sao_Paulo")
+                .subtract(3, "hour")
+                .format("DD/MM/YYYY")}
             </td>
           </tr>
           <tr>
@@ -61,7 +100,9 @@ export function generateFullTable(tableContent: FullTableContent): string {
             <td class="tbodyColumn">
               Descrição
             </td>
-            <td class="tbodyColumn">
+            <td class="tbodyColumn" style="background-color: ${
+              table.color !== "green" || !table.color ? "#A9A9A9" : "yellow"
+            };">
               <p>
               ${table.description}
               </p>
@@ -79,8 +120,10 @@ export function generateFullTable(tableContent: FullTableContent): string {
             <td class="tbodyColumn">
               A Pagar
             </td>
-            <td class="tbodyColumn">
-              R$ ${table.total.toFixed(2)}
+            <td class="tbodyColumn" style="background-color: ${
+              table.color !== "green" || !table.color ? "#A9A9A9" : "yellow"
+            };">
+              R$ ${parseFloat(total).toFixed(2)}
             </td>
           </tr>
           <tr>
@@ -93,7 +136,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
           </tr>
           <tr>
             <td class="tbodyColumn">
-              Forma de entrega
+              Entrega 
             </td>
             <td class="tbodyColumn">
               ${table.delivery}
@@ -101,9 +144,21 @@ export function generateFullTable(tableContent: FullTableContent): string {
           </tr>
           <tr>
             <td class="tbodyColumn">
+              Observações
+            </td>
+            <td class="tbodyColumn" style="background-color: red;">
+              <p>
+                ${table.comments}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="tbodyColumn" style="padding-bottom: 0.5rem; padding-top: 0.5rem;">
               Endereço
             </td>
-            <td class="tbodyColumn" colspan="2" style="padding-bottom: 10px;">
+            <td class="tbodyColumn" colspan="2" style="background-color: ${
+              table.color !== "green" || !table.color ? "#A9A9A9" : "yellow"
+            };">
               <p>
                 ${table.address}
               </p>
@@ -127,7 +182,8 @@ export function generateFullTable(tableContent: FullTableContent): string {
       * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
+        overflow: hidden;
         font-family: Arial, Helvetica, sans-serif;
       }
       
@@ -141,27 +197,37 @@ export function generateFullTable(tableContent: FullTableContent): string {
         border: solid 1px black;
         border-collapse: collapse;
         width: 100%;
+        height: 560px;
+        max-height: 560px !important;
+        display: table;
       }
   
       article {
         width: 430px;
+        max-height: 560px !important;
         margin-right: 30px;
-        margin-bottom: 65px;
+        margin-bottom: 37px;
       }
   
       p {
-        white-space: pre-line;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        overflow-wrap: normal;
+        font-family: Arial, Helvetica, sans-serif;
+        overflow: hidden;
+        max-height: 70px;
       }
   
       .tbodyColumn {
         display: table-cell;
+        height: 1fr;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
         border: solid 1px black;
         text-align: center;
-        white-space: nowrap;
-        width: fit-content;
-        font-size: small;
+        width: 120px;
+        font-size: 14.5px;
+        font-family: Arial, Helvetica, sans-serif;
       }
   
       td + td {
@@ -171,25 +237,39 @@ export function generateFullTable(tableContent: FullTableContent): string {
       #imgCell {
         display: table-cell;
         border: solid 1px black;
-        width: 320px;
+        width: 160px !important;
+        max-width: 160px !important;
+        max-height: 420px !important;
         height: 420px;
         padding: 1px;
       }
   
       img {
+        max-height: 360px;
+        max-width: 160px;
         object-fit: contain;
-        width: 100%;
-        max-height: 320px;
       }
-  
-      .flex {
-        display: flex;
-        flex-wrap: wrap;
-        height: 100%;
+
+      .rotatedImage {
+        transform: rotate(90deg);
+        max-height: 160px;
+        max-width: 100px;
       }
   
       .flexChildren {
-        flex: 1
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 160px;
+        max-height: 100px;
+      }
+
+      .flex {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        height: 100% !important;
       }
     </style>
   </head>

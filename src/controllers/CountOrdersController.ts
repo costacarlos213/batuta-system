@@ -1,10 +1,10 @@
-import { Request, Response } from "express"
-import { CountOrdersUseCase } from "src/useCases/countOrders/CountOrdersUseCase"
+import { Response } from "express"
+import { CountOrdersUseCase } from "../useCases/countOrders/CountOrdersUseCase"
 
 export class CountOrdersController {
   constructor(private countOrdersUseCase: CountOrdersUseCase) {}
 
-  async handle(req: Request, res: Response): Promise<Response> {
+  async handle(res: Response): Promise<Response> {
     try {
       const numberOfOrders = await this.countOrdersUseCase.execute()
 

@@ -18,7 +18,6 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "declaration": true,
-    "declarationDir": "./@types",
     "paths": {}
   },
   "include": ["src/**/*"],

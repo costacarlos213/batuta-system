@@ -1,6 +1,6 @@
-import { CreateUserController } from "src/controllers/CreateUserController"
-import { VendorRepository } from "src/repositories/userRepository/implementation/VendorRepository"
-import { CreateUserUseCase } from "src/useCases/createUser/CreateUserUseCase"
+import { CreateUserController } from "../controllers/CreateUserController"
+import { VendorRepository } from "../repositories/userRepository/implementation/VendorRepository"
+import { CreateUserUseCase } from "../useCases/createUser/CreateUserUseCase"
 
 function createUserControllerFactory() {
   const userRepository = new VendorRepository()

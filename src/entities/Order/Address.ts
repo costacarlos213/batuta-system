@@ -6,6 +6,10 @@ export class Address {
   }
 
   static create(address: string): Address {
+    if (!address || address.length === 0 || address === "undefined") {
+      return new Address("")
+    }
+
     const isValid = this.validate(address)
 
     if (!isValid) throw new Error("Invalid Address")
@@ -14,12 +18,6 @@ export class Address {
   }
 
   private static validate(address: string): boolean {
-    if (!address) {
-      return false
-    }
-
-    if (typeof address !== "string") return false
-
     const trimmedAddress = address.trim()
 
     if (trimmedAddress.length < 2 || trimmedAddress.length > 255) {

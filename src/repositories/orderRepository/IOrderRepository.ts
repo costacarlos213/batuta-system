@@ -1,6 +1,6 @@
-import { Order } from "src/entities/Order/Order"
+import { Order } from "../../entities/Order/Order"
 import { Order as PrismaOrder } from "@prisma/client"
-import { IFilters } from "src/@types/report"
+import { IFilters } from "../../@types/report"
 
 export interface IOrderId {
   id: string

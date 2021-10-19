@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  mongo0:
+    image: backend_mongo
+    container_name: "mongo0"
+    volumes:
+      - "./mongo/setup.sh:/scripts/setup.sh"
+    command: mongod --oplogSize 128 --keyFile /data/keyfile --replSet rs0 --journal --bind_ip_all
+    depends_on:
+      - "mongo1"
+      - "mongo2"
+    ports:
+      - "27017:27017"
+    networks:
+      - clst0
+      - private_net
+
+  mongo1:
+    image: backend_mongo
+    container_name: "mongo1"
+    entrypoint:
+      [
+        "mongod",
+        "--oplogSize",
+        "128",
+        "--keyFile",
+        "/data/keyfile",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--bind_ip_all"
+      ]
+    ports:
+      - "27018:27017"
+    networks:
+      - clst0
+      - private_net
+
+  mongo2:
+    image: backend_mongo
+    container_name: "mongo2"
+    entrypoint:
+      [
+        "mongod",
+        "--oplogSize",
+        "128",
+        "--keyFile",
+        "/data/keyfile",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--bind_ip_all"
+      ]
+    ports:
+      - "27019:27017"
+    networks:
+      - clst0
+      - private_net
+
+  api:
+    build: .
+    container_name: "api"
+    restart: always
+    env_file:
+      - ".env"
+    depends_on:
+      - "mongo0"
+      - "redis"
+    ports:
+      - "3333:3333"
+    command: yarn start
+    networks:
+      - private_net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  redis:
+    container_name: redis
+    restart: always
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - private_net
+
+networks:
+  clst0:
+  private_net:

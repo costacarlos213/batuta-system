@@ -3,13 +3,13 @@ import { IRefreshTokenDTO } from "./RefreshTokenUseCaseDTO"
 
 export class RefreshTokenUseCase {
   async execute(userData: IRefreshTokenDTO): Promise<string> {
-    const { refreshToken, userId } = userData
+    const { refreshToken, userId, userRole } = userData
 
-    if (!userId || !refreshToken) {
+    if (!userId || !refreshToken || !userRole) {
       throw new Error("Missing token or userId.")
     }
 
-    const accessToken = generateAccessToken(userId)
+    const accessToken = generateAccessToken(userId, userRole)
 
     return accessToken
   }

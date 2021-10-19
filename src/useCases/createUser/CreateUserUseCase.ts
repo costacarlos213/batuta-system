@@ -1,4 +1,4 @@
-import { IVendorRepository } from "src/repositories/userRepository/IVendorRepository"
+import { IVendorRepository } from "../../repositories/userRepository/IVendorRepository"
 import { ICreateUserDTO } from "./CreateUserDTO"
 import bcrypt from "bcrypt"
 import { Vendor } from "../../entities/Vendor/Vendor"
@@ -7,26 +7,58 @@ import { ObjectId } from "bson"
 export class CreateUserUseCase {
   constructor(private vendorRepository: IVendorRepository) {}
 
-  async execute(vendorData: ICreateUserDTO): Promise<void> {
-    const { password, name, email } = vendorData
+  async execute(vendorData: ICreateUserDTO): Promise<void | Error> {
+    let error: Error
 
-    if (!password || !name || !email) {
-      throw new Error("Missing params")
-    }
+    const userArray = await vendorData.vendors.map(vendor => {
+      const { password, name, email, pixKey, pixType } = vendor
 
-    const hashPassword = await bcrypt.hash(password.trim(), 8)
-    const id = new ObjectId()
+      let validPassword = password
+      let validEmail = email
 
-    const value = name.toLowerCase().replace(" ", "-")
+      if (!name) {
+        error = new Error("Missing Name")
+      }
 
-    const user = Vendor.create({
-      password: hashPassword,
-      email,
-      name,
-      value,
-      id
+      if (
+        pixType !== "randomKey" &&
+        pixType !== "phone" &&
+        pixType !== "cpf" &&
+        pixType !== "email"
+      ) {
+        error = new Error("Unknown Pix Type")
+      }
+
+      if (!validEmail || validEmail.length === 0) {
+        validEmail = `${name}${Math.floor(
+          Math.random() * 10000 + 1
+        )}@batutawind.com`
+      }
+
+      if (!validPassword || validPassword.length === 0) {
+        validPassword = ""
+      }
+
+      const hashPassword = bcrypt.hashSync(validPassword.trim(), 8)
+      const id = new ObjectId()
+
+      const newVendor = Vendor.create({
+        password: hashPassword,
+        email: validEmail,
+        pixKey,
+        pixType,
+        role: "vendor",
+        name,
+        id
+      })
+
+      return newVendor
     })
 
-    await this.vendorRepository.save(user)
+    if (error) {
+      throw error
+    }
+
+    await this.vendorRepository.save(userArray)
   }
 }

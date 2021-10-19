@@ -23,19 +23,24 @@ export async function verifyRefreshToken(
       refreshToken
     }
 
-    // const tokenRepository = new TokenRepository()
+    const tokenRepository = new TokenRepository()
 
-    // const storedToken = await tokenRepository.get(decoded.sub.toString())
+    const storedToken = await tokenRepository.get(decoded.sub.toString())
 
-    // if (!storedToken) {
-    //   return res.status(401).json({ message: "Refresh token isn't stored." })
-    // }
+    if (!storedToken) {
+      console.log("refresh token isnt stored")
+      return res.status(401).json({ message: "Refresh token isn't stored." })
+    }
 
-    // if (JSON.parse(storedToken).token !== refreshToken)
-    //   return res.status(401).json({ message: "Wrong refresh token." })
+    if (JSON.parse(storedToken).token !== refreshToken) {
+      console.log("wrong refresh token")
+      return res.status(401).json({ message: "Wrong refresh token." })
+    }
 
     next()
   } catch (error) {
+    console.log(error)
+
     return res
       .status(401)
       .json({ message: "Invalid session", data: error.message })

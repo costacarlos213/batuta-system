@@ -2,6 +2,7 @@ import { ObjectId } from "bson"
 import { Email } from "./Email"
 import { IVendor } from "./IVendor"
 import { StringType as Name } from "../StringType"
+import { Pix, Role } from "../../@types/vendor"
 
 export class Vendor {
   private readonly _id: ObjectId
@@ -9,8 +10,10 @@ export class Vendor {
   private constructor(
     public readonly Name: Name,
     public readonly Email: Email,
-    public readonly Password: string,
-    public readonly Value: string,
+    public readonly Password?: string,
+    public readonly PixType?: Pix,
+    public readonly PixKey?: string,
+    public readonly Role?: Role,
     id?: ObjectId
   ) {
     if (id) {
@@ -25,15 +28,23 @@ export class Vendor {
   }
 
   static create(vendorData: IVendor): Vendor {
-    const { name, email, password, id, value } = vendorData
+    const { name, email, password, id, pixKey, pixType, role } = vendorData
 
-    if (!name || !email || !password || !value) {
-      throw new Error("Missing create options")
+    if (!name) {
+      throw new Error("Missing name option")
     }
 
     const formatedName = Name.create(name.trim())
     const formatedEmail = Email.create(email.trim())
 
-    return new Vendor(formatedName, formatedEmail, password, value, id)
+    return new Vendor(
+      formatedName,
+      formatedEmail,
+      password,
+      pixType,
+      pixKey,
+      role,
+      id
+    )
   }
 }

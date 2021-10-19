@@ -1,8 +1,8 @@
 import { ObjectId } from "bson"
-import { AllowedColors } from "src/entities/Order/IOrder"
-import { Order } from "src/entities/Order/Order"
-import { IOrderRepository } from "src/repositories/orderRepository/IOrderRepository"
-import { ITokenRepository } from "src/repositories/tokenRepository/ITokenRepository"
+import { AllowedColors } from "../../entities/Order/IOrder"
+import { Order } from "../../entities/Order/Order"
+import { IOrderRepository } from "../../repositories/orderRepository/IOrderRepository"
+import { ITokenRepository } from "../../repositories/tokenRepository/ITokenRepository"
 import { ICreateOrderDTO } from "./CreateOrderDTO"
 
 export class CreateOrderUseCase {
@@ -12,39 +12,11 @@ export class CreateOrderUseCase {
   ) {}
 
   async execute(orderData: ICreateOrderDTO): Promise<void> {
-    const {
-      customerName,
-      description,
-      payment,
-      phone,
-      total,
-      vendor,
-      delivery,
-      address,
-      title,
-      files,
-      color
-    } = orderData
-
-    if (
-      !customerName ||
-      !description ||
-      !payment ||
-      !phone ||
-      !total ||
-      !vendor ||
-      !delivery ||
-      !address ||
-      !files ||
-      !title ||
-      !color
-    ) {
-      throw new Error("Missing Params")
-    }
+    const { files } = orderData
 
     const orders = []
 
-    if (typeof orderData.customerName === "string") {
+    if (typeof orderData.vendor === "string") {
       const id = new ObjectId()
 
       const fileNames = files.map(file => {
@@ -55,30 +27,41 @@ export class CreateOrderUseCase {
         return file.location
       })
 
+      const fileSizes = files.map(file => {
+        return file.size
+      })
+
       const code = await this.tokenRepository.get("code")
       const newCode = (parseInt(code) + 1).toLocaleString("en-US", {
-        minimumIntegerDigits: 3,
+        minimumIntegerDigits: 4,
         useGrouping: false
       })
       const orderCod = `${orderData.vendor?.toString()[0]}${newCode}`
 
+      let total = orderData.total
+
+      if (total === "" || !total || total.length === 0) {
+        total = "0"
+      }
+
       orders.push(
         Order.create({
           cod: orderCod,
-          customerName: orderData.customerName?.toString(),
-          description: orderData.description?.toString(),
-          payment: orderData.payment?.toString(),
-          phone: orderData.phone?.toString(),
-          vendor: orderData.vendor?.toString(),
-          total: parseFloat(orderData.total?.toString()),
-          address: orderData.address?.toString(),
-          delivery: orderData.delivery?.toString(),
-          comments: orderData.comments?.toString(),
-          color: orderData.color as AllowedColors,
-          title: orderData.title?.toString(),
+          customerName: orderData.customerName as string | undefined,
+          description: orderData.description as string | undefined,
+          payment: orderData.payment as string | undefined,
+          phone: orderData.phone as string | undefined,
+          vendor: orderData.vendor as string | undefined,
+          total: parseFloat(total as string),
+          address: orderData.address as string | undefined,
+          delivery: orderData.delivery as string | undefined,
+          comments: orderData.comments as string | undefined,
+          color: orderData.color as AllowedColors | undefined,
+          title: orderData.title as string | undefined,
           files: {
             fileKeys: fileUrl,
-            fileUrls: fileNames
+            fileUrls: fileNames,
+            fileSizes
           },
           id
         })
@@ -88,12 +71,13 @@ export class CreateOrderUseCase {
         key: "code",
         value: newCode.toString()
       })
-    } else if (typeof orderData.customerName === "object") {
-      for (let i = 0; i < orderData.customerName.length; i++) {
+    } else if (typeof orderData.vendor === "object") {
+      for (let i = 0; i < orderData.vendor.length; i++) {
         const id = new ObjectId()
 
         const fileNames = []
         const fileKeys = []
+        const fileSizes = []
 
         files.forEach(file => {
           const fileFieldIndex = file.fieldname.slice(7).split("_")[1]
@@ -101,15 +85,22 @@ export class CreateOrderUseCase {
           if (fileFieldIndex === i.toString()) {
             fileNames.push(file.key)
             fileKeys.push(file.location)
+            fileSizes.push(file.size)
           }
         })
 
         const code = await this.tokenRepository.get("code")
         const newCode = (parseInt(code) + 1).toLocaleString("en-US", {
-          minimumIntegerDigits: 3,
+          minimumIntegerDigits: 4,
           useGrouping: false
         })
-        const orderCod = `${orderData.vendor?.toString()[0]}${newCode}`
+        const orderCod = `${orderData.vendor[i][0]}${newCode}`
+
+        let total = orderData.total[i]
+
+        if (total === "" || !total || total.length === 0) {
+          total = "0"
+        }
 
         orders.push(
           Order.create({
@@ -119,7 +110,7 @@ export class CreateOrderUseCase {
             payment: orderData.payment[i],
             phone: orderData.phone[i],
             vendor: orderData.vendor[i],
-            total: parseFloat(orderData.total[i]),
+            total: parseFloat(total),
             address: orderData.address[i],
             delivery: orderData.delivery[i],
             comments: orderData.comments[i],
@@ -127,7 +118,8 @@ export class CreateOrderUseCase {
             title: orderData.title[i],
             files: {
               fileKeys,
-              fileUrls: fileNames
+              fileUrls: fileNames,
+              fileSizes
             },
             id
           })

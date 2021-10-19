@@ -12,12 +12,11 @@ dotenv.config()
 app.use(cookieParser())
 app.use(
   cors({
-    credentials: true,
-    origin: "http://localhost:3000"
+    credentials: true
   })
 )
 
-app.use("/images", express.static(path.join(__dirname, "/public/uploads")))
+app.use("/files", express.static(path.join(__dirname, "/public/uploads")))
 app.use(express.urlencoded({ extended: true }))
 app.use(json())
 app.use(router)

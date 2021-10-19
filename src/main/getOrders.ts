@@ -1,6 +1,6 @@
-import { GetOrdersController } from "src/controllers/GetOrdersController"
-import { OrderRepository } from "src/repositories/orderRepository/implementation/OrderRepository"
-import { GetOrdersUseCase } from "src/useCases/getOrders/getOrdersUseCase"
+import { GetOrdersController } from "../controllers/GetOrdersController"
+import { OrderRepository } from "../repositories/orderRepository/implementation/OrderRepository"
+import { GetOrdersUseCase } from "../useCases/getOrders/getOrdersUseCase"
 
 function getOrdersControllerFactory() {
   const orderRepository = new OrderRepository()

@@ -8,16 +8,20 @@ import { refreshTokenController } from "./main/refreshToken"
 import { verifyRefreshToken } from "./middlewares/verifyRefreshToken"
 import { verifyToken } from "./middlewares/verifyToken"
 import { getOrdersController } from "./main/getOrders"
-import { createPDFController } from "./main/createPDF"
 import { uploadFileMiddleware } from "./middlewares/uploadFile"
 import { updateOrderController } from "./main/updateOrder"
 import { deleteOrderController } from "./main/deleteOrder"
 import { countOrdersController } from "./main/CountOrders"
+import { getNamesController } from "./main/getNames"
 
 const router = Router()
 
 router.post("/user", async (req: Request, res: Response) => {
   return await createUserController.handle(req, res)
+})
+
+router.get("/user", async (req: Request, res: Response) => {
+  return await getNamesController.handler(req, res)
 })
 
 router.post(
@@ -32,8 +36,8 @@ router.get("/order", async (req, res) => {
   return await getOrdersController.handle(req, res)
 })
 
-router.get("/order/count", verifyToken, async (req, res) => {
-  return await countOrdersController.handle(req, res)
+router.get("/order/count", async (req, res) => {
+  return await countOrdersController.handle(res)
 })
 
 router.put("/order", uploadFileMiddleware, async (req, res) => {
@@ -50,7 +54,7 @@ router.post("/auth/login", async (req, res) => {
   return await loginController.handle(req, res)
 })
 
-router.get("/auth/logout", verifyToken, async (req, res) => {
+router.delete("/auth/logout", verifyToken, async (req, res) => {
   return await logoutController.handle(req, res)
 })
 
@@ -60,10 +64,6 @@ router.get("/token", verifyRefreshToken, async (req, res) => {
 
 router.post("/print", verifyToken, async (req, res) => {
   return await printSimpleController.handle(req, res)
-})
-
-router.post("/pdf", verifyToken, async (req, res) => {
-  return await createPDFController.handle(req, res)
 })
 
 export { router }

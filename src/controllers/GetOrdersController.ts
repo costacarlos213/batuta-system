@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
-import { IFilters } from "src/@types/report"
-import { GetOrdersUseCase } from "src/useCases/getOrders/getOrdersUseCase"
+import { IFilters } from "../@types/report"
+import { GetOrdersUseCase } from "../useCases/getOrders/getOrdersUseCase"
 
 export class GetOrdersController {
   constructor(private getOrdersUseCase: GetOrdersUseCase) {}
@@ -19,7 +19,9 @@ export class GetOrdersController {
         finalDate: req.query.finalDate?.toString(),
         initialDate: req.query.initialDate?.toString()
       },
-      vendor: req.query.vendor?.toString()
+      vendor: req.query.vendor?.toString(),
+      title: req.query.title?.toString(),
+      color: req.query.color?.toString() as "green" | "yellow"
     }
 
     try {
@@ -27,7 +29,8 @@ export class GetOrdersController {
 
       return res.status(200).json(orders)
     } catch (error) {
-      console.log(error.message)
+      console.log(error)
+
       return res.status(500).json({
         message: error.message
       })

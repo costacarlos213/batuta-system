@@ -1,4 +1,4 @@
-import { AllowedColors } from "src/entities/Order/IOrder"
+import { AllowedColors } from "../../entities/Order/IOrder"
 
 interface IFile {
   fieldname: string

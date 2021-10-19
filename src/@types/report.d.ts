@@ -14,4 +14,6 @@ export interface IFilters {
   delivery?: string
   timeInterval?: ITimeInterval
   id?: string
+  color?: "green" | "yellow"
+  title?: string
 }

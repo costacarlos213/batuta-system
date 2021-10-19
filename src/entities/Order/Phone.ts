@@ -2,11 +2,15 @@ class Phone {
   constructor(private readonly _phoneNumber: string) {}
 
   static create(phone: string): Phone {
+    if (!phone || phone.length === 0 || phone === "undefined") {
+      return new Phone("")
+    }
+
     const isValid = this.validate(phone)
 
     if (!isValid) throw new Error("Invalid Phone")
 
-    return new Phone(phone.trim())
+    return new Phone(phone.trim().replace(/[\s().-]+/g, ""))
   }
 
   get value(): string {
@@ -14,16 +18,7 @@ class Phone {
   }
 
   private static validate(phone: string): boolean {
-    if (!phone) {
-      return false
-    }
-
-    if (phone.length === 0) {
-      return false
-    }
-
     const cleanPhone = phone.replace(/[\s().-]+/g, "")
-    const cleanerPhone = phone.replace(/\D+/g, "")
 
     const tester =
       /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/

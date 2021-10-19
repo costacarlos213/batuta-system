@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { SimpleTableContent } from "src/@types/table"
+import { SimpleTableContent } from "../../@types/table"
 
 export function generateSimpleTable(tableContent: SimpleTableContent): string {
   const tableRows: string[] = []
@@ -7,6 +7,18 @@ export function generateSimpleTable(tableContent: SimpleTableContent): string {
 
   tableContent.map(row => {
     sum = row.total + sum
+
+    let total: string
+
+    if (!row.total) {
+      total = "0"
+    } else {
+      total = row.total.toString()
+    }
+
+    if (total === "" || total.length === 0) {
+      total = "0"
+    }
 
     return tableRows.push(`
         <tr>
@@ -26,7 +38,7 @@ export function generateSimpleTable(tableContent: SimpleTableContent): string {
             ${row.description}
           </td>
           <td class="tbodyColumn">
-            ${row.total.toFixed(2)}
+            ${parseFloat(total).toFixed(2)}
           </td>
           <td class="tbodyColumn">
             ${row.delivery}

@@ -1,6 +1,6 @@
-import { DeleteOrderController } from "src/controllers/DeleteOrderController"
-import { OrderRepository } from "src/repositories/orderRepository/implementation/OrderRepository"
-import { DeleteOrderUseCase } from "src/useCases/deleteOrder/DeleteOrderUseCase"
+import { DeleteOrderController } from "../controllers/DeleteOrderController"
+import { OrderRepository } from "../repositories/orderRepository/implementation/OrderRepository"
+import { DeleteOrderUseCase } from "../useCases/deleteOrder/DeleteOrderUseCase"
 
 function deleteOrderControllerFactory() {
   const orderRepository = new OrderRepository()

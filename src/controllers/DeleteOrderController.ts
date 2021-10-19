@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { DeleteOrderUseCase } from "src/useCases/deleteOrder/DeleteOrderUseCase"
+import { DeleteOrderUseCase } from "../useCases/deleteOrder/DeleteOrderUseCase"
 
 export class DeleteOrderController {
   constructor(private deleteOrderUseCase: DeleteOrderUseCase) {}

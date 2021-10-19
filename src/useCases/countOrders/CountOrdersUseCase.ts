@@ -1,4 +1,4 @@
-import { IOrderRepository } from "src/repositories/orderRepository/IOrderRepository"
+import { IOrderRepository } from "../../repositories/orderRepository/IOrderRepository"
 
 export class CountOrdersUseCase {
   constructor(private orderRepository: IOrderRepository) {}

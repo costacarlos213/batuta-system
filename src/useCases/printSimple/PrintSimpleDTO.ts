@@ -1,4 +1,4 @@
-import { FullTableContent, SimpleTableContent } from "src/@types/table"
+import { FullTableContent, SimpleTableContent } from "../../@types/table"
 
 export interface IPrintPDFDTO {
   pdfData: SimpleTableContent | FullTableContent

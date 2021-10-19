@@ -1,8 +1,11 @@
-import { PrintSimpleController } from "src/controllers/PrintSimpleController"
-import { PrintSimpleUseCase } from "src/useCases/printSimple/PrintSimpleUseCase"
+import { PdfProvider } from "../providers/pdf/pdfProvider"
+import { PrintSimpleController } from "../controllers/PrintSimpleController"
+import { PrintSimpleUseCase } from "../useCases/printSimple/PrintSimpleUseCase"
 
 function printSimpleControllerFactory() {
-  const printSimpleUseCase = new PrintSimpleUseCase()
+  const pdfProvider = new PdfProvider()
+
+  const printSimpleUseCase = new PrintSimpleUseCase(pdfProvider)
 
   const printSimpleController = new PrintSimpleController(printSimpleUseCase)
 

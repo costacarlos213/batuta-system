@@ -11,6 +11,7 @@ module.exports = {
     '@babel/preset-typescript'
   ],
   plugins: [
+    'const-enum',
     ['module-resolver', {
       alias: {
         // insert the same tsconfig.json paths

@@ -14,28 +14,43 @@ generator client {
 model Order {
   id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   cod          String
-  customerName String
-  description  String
-  total        Float
-  delivery     String
-  payment      String
-  address      String
-  phone        String
+  customerName String?
+  description  String?
+  total        Float?
+  delivery     String?
+  payment      String?
+  address      String?
+  phone        String?
   comments     String?
-  date         String
-  vendor       String
-  title        String
-  color        Colors
+  date         String?
+  vendor       String?
+  title        String?
+  color        Colors?
   fileNames    String[]
   fileKeys     String[]
+  fileSizes    Int[]
 }
 
 model User {
-  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id       String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name     String
-  email    String @unique
-  password String
-  value    String
+  email    String  @unique
+  password String?
+  pixType  Pix?
+  pixKey   String?
+  role     Roles
+}
+
+enum Pix {
+  randomKey
+  phone
+  cpf
+  email
+}
+
+enum Roles {
+  admin
+  vendor
 }
 
 enum Colors {

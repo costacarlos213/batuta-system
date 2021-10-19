@@ -1,7 +1,9 @@
-import { prisma } from "src/database/prisma"
+import { prisma } from "../../../database/prisma"
 import { Vendor } from "../../../entities/Vendor/Vendor"
 import { User } from "@prisma/client"
 import { IVendorRepository } from "../IVendorRepository"
+import { IVendorInfo } from "../../../useCases/getNames/GetNamesUseCase"
+import { IGetUserDTO } from "src/useCases/getNames/GetUserDTO"
 
 export class VendorRepository implements IVendorRepository {
   async get(email: string): Promise<User> {
@@ -14,19 +16,46 @@ export class VendorRepository implements IVendorRepository {
     return vendor
   }
 
-  async save(vendor: Vendor): Promise<void> {
-    const alreadyExists = await this.alreadyExists(vendor.Email.value)
-
-    if (alreadyExists) throw new Error("User already exists.")
-
-    await prisma.user.create({
-      data: {
-        email: vendor.Email.value,
-        name: vendor.Name.value,
-        password: vendor.Password,
-        value: vendor.Value,
-        id: vendor.id.toHexString()
+  async getNames(filter?: IGetUserDTO): Promise<IVendorInfo[]> {
+    const vendors = await prisma.user.findMany({
+      select: {
+        name: true,
+        pixKey: true,
+        id: true,
+        pixType: true
+      },
+      where: {
+        AND: [{ role: { equals: "vendor" } }, { id: { equals: filter?.id } }]
       }
+    })
+
+    return vendors
+  }
+
+  async save(vendors: Vendor[]): Promise<void> {
+    const formatedVendors = []
+
+    vendors.forEach(async vendor => {
+      const alreadyExists = await this.alreadyExists(vendor.Email.value)
+
+      if (alreadyExists)
+        throw new Error(`Usuário "${vendor.Name.value}" já existe.`)
+    })
+
+    vendors.map(vendor => {
+      return formatedVendors.push({
+        name: vendor.Name.value,
+        email: vendor.Email.value,
+        password: vendor.Password,
+        pixType: vendor.PixType,
+        pixKey: vendor.PixKey,
+        role: vendor.Role,
+        id: vendor.id.toHexString()
+      })
+    })
+
+    await prisma.user.createMany({
+      data: formatedVendors
     })
   }
 

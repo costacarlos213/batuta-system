@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { UpdateOrderUseCase } from "src/useCases/updateOrder/UpdateOrderUseCase"
+import { UpdateOrderUseCase } from "../useCases/updateOrder/UpdateOrderUseCase"
 
 export class UpdateOrderController {
   constructor(private updateOrderUseCase: UpdateOrderUseCase) {}
@@ -24,6 +24,7 @@ export class UpdateOrderController {
     try {
       await this.updateOrderUseCase.execute({
         ...updateData,
+        date: updateData.initialDate,
         insertedFiles: req?.files,
         deletedFiles: updateData.deletedFiles
           ? JSON.parse(updateData.deletedFiles)

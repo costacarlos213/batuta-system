@@ -18,7 +18,7 @@ export class Code {
       return false
     }
 
-    if (code.length !== 4) {
+    if (code.length < 4) {
       return false
     }
 

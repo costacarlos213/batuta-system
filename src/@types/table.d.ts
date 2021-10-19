@@ -22,4 +22,5 @@ export type FullTableContent = Array<{
   color: "green" | "yellow"
   title: string
   fileKeys: string[]
+  comments: string
 }>

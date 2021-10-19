@@ -1,22 +1,22 @@
-import puppeteer from "puppeteer"
-import { FullTableContent, SimpleTableContent } from "src/@types/table"
-import { generateFullTable } from "src/providers/html/FullTableProvider"
-import { generateSimpleTable } from "src/providers/html/SimpleTableProvider"
+import { FullTableContent, SimpleTableContent } from "../../@types/table"
+import { generateFullTable } from "../../providers/html/FullTableProvider"
+import { generateSimpleTable } from "../../providers/html/SimpleTableProvider"
 import { IPrintPDFDTO } from "./PrintSimpleDTO"
+import { IPdfProvider } from "../../providers/pdf/IPdfProviderDTO"
+
+type margintype = {
+  top?: string
+  left?: string
+  right?: string
+  bottom?: string
+}
 
 export class PrintSimpleUseCase {
+  constructor(private pdfProvider: IPdfProvider) {}
+
   async execute({ pdfData, pdfType }: IPrintPDFDTO): Promise<Buffer> {
-    const browser = await puppeteer.launch()
-
-    const page = await browser.newPage()
-
     let pdfContent: string
-    let margin: {
-      top?: string
-      left?: string
-      right?: string
-      bottom?: string
-    }
+    let margin: margintype
     let scale: number
 
     if (pdfType === "simple") {
@@ -33,24 +33,18 @@ export class PrintSimpleUseCase {
       pdfContent = generateFullTable(pdfData as FullTableContent)
 
       margin = {
-        top: "3cm",
+        top: "2.5cm",
         left: "1cm",
         bottom: "2cm"
       }
       scale = 0.8
     }
 
-    await page.setContent(pdfContent)
-
-    const pdfBuffer = await page.pdf({
-      format: "a4",
-      printBackground: true,
+    const pdfBuffer = await this.pdfProvider.execute({
       margin,
-      scale
+      scale,
+      pdfContent
     })
-
-    await page.close()
-    await browser.close()
 
     return pdfBuffer
   }

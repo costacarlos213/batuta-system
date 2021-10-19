@@ -1,6 +1,6 @@
-import { IFilters } from "src/@types/report"
-import { prisma } from "src/database/prisma"
-import { Order } from "src/entities/Order/Order"
+import { IFilters } from "../../../@types/report"
+import { prisma } from "../../../database/prisma"
+import { Order } from "../../../entities/Order/Order"
 import { Order as PrismaOrder } from "@prisma/client"
 import aws from "aws-sdk"
 
@@ -19,6 +19,10 @@ export class OrderRepository implements IOrderRepository {
 
   async get(filters: IFilters): Promise<PrismaOrder[]> {
     const orders = await prisma.order.findMany({
+      take: 60,
+      orderBy: {
+        date: "desc"
+      },
       where: {
         AND: [
           {
@@ -47,6 +51,12 @@ export class OrderRepository implements IOrderRepository {
           },
           {
             vendor: { equals: filters?.vendor }
+          },
+          {
+            title: { contains: filters?.title }
+          },
+          {
+            color: { equals: filters?.color }
           },
           {
             date: {
@@ -79,6 +89,7 @@ export class OrderRepository implements IOrderRepository {
         comments: order.Comments,
         fileNames: order.Files.fileUrls,
         fileKeys: order.Files.fileKeys,
+        fileSizes: order.Files.fileSizes,
         id: order.id.toHexString(),
         title: order.Title.value,
         color: order.Color
@@ -126,7 +137,9 @@ export class OrderRepository implements IOrderRepository {
         color: order.Color,
         fileKeys: order.Files.fileUrls,
         fileNames: order.Files.fileKeys,
-        title: order.Title.value
+        fileSizes: order.Files.fileSizes,
+        title: order.Title.value,
+        date: order.Date
       }
     })
   }
