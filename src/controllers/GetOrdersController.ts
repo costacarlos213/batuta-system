@@ -19,7 +19,7 @@ export class GetOrdersController {
         finalDate: req.query.finalDate?.toString(),
         initialDate: req.query.initialDate?.toString()
       },
-      vendor: req.query.vendor?.toString(),
+      vendorId: req.query.vendorId?.toString(),
       title: req.query.title?.toString(),
       color: req.query.color?.toString() as "green" | "yellow"
     }

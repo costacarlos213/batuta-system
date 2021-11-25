@@ -2,7 +2,10 @@ import { ObjectId } from "bson"
 import { Email } from "./Email"
 import { IVendor } from "./IVendor"
 import { StringType as Name } from "../StringType"
-import { Pix, Role } from "../../@types/vendor"
+
+type Role = "admin" | "vendor"
+
+type Pix = "randomKey" | "phone" | "cpf" | "email"
 
 export class Vendor {
   private readonly _id: ObjectId

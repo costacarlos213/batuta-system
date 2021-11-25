@@ -1,4 +1,4 @@
-import { Role } from "../../entities/Vendor/IVendor"
+import { Role } from "../../@types/vendor"
 
 export interface IRefreshTokenDTO {
   refreshToken: string

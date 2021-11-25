@@ -14,7 +14,7 @@ interface IFile {
 }
 
 export interface ICreateOrderDTO {
-  vendor: string | string[]
+  vendorId: string | string[]
   comments: string | string[]
   total: string | string[]
   customerName: string | string[]

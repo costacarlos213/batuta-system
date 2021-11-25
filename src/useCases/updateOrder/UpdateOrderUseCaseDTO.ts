@@ -12,7 +12,7 @@ interface IFile {
 }
 
 export interface IUpdateOrderDTO {
-  vendor?: string
+  vendorId?: string
   date?: string
   total?: string
   customerName?: string

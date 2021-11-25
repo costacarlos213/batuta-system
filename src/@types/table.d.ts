@@ -4,8 +4,12 @@ export type SimpleTableContent = Array<{
   delivery: string
   description: string
   customerName: string
-  vendor: string
   total: number
+  vendor: {
+    name: string
+    pixType: string
+    pixKey: string
+  }
 }>
 
 export type FullTableContent = Array<{
@@ -17,10 +21,14 @@ export type FullTableContent = Array<{
   delivery: string
   description: string
   customerName: string
-  vendor: string
   total: number
   color: "green" | "yellow"
   title: string
   fileKeys: string[]
   comments: string
+  vendor: {
+    name: string
+    pixType: string
+    pixKey: string
+  }
 }>

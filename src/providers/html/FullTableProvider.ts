@@ -20,6 +20,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
     const phone = formatPhone(table.phone)
 
     let images = ""
+    let pixType: string
     const numberOfImages = table.fileKeys.length
 
     table.fileKeys.forEach(fileName => {
@@ -44,16 +45,40 @@ export function generateFullTable(tableContent: FullTableContent): string {
       total = "0"
     }
 
+    switch (table.vendor.pixType) {
+      case "cpf":
+        pixType = "Cpf"
+        break
+
+      case "email":
+        pixType = "Email"
+        break
+
+      case "phone":
+        pixType = "Telefone"
+        break
+
+      case "randomKey":
+        pixType = "Chave Aleatória"
+        break
+
+      default:
+        pixType = ""
+        break
+    }
+
     return articles.push(`
       <article>
       <table>
         <thead>
           <th colspan="3" style="background-color: ${
             table.color !== "green" || !table.color ? "#A9A9A9" : "yellow"
-          };">
+          }; border-right: solid 1px black;">
             <h1>
               ${table.title.toUpperCase()}
             </h1>
+          </th>
+          <th colspan="3" style="background-color: red;">
           </th>
         </thead>
         <tbody>
@@ -65,7 +90,16 @@ export function generateFullTable(tableContent: FullTableContent): string {
               ${table.cod}
             </td>
             <td id="imgCell" rowspan="10">
-              <div class="flex" style="justify-content: flex-start;">${images}</div>
+              <div class="flex" style="justify-content: flex-start;">${
+                images.length === 0 ? "<p>.</p>" : images
+              }</div>
+            </td>
+            <td rowspan="11" class="vendorInfo">
+            <p>
+            Chave Pix - ${pixType}: ${table.vendor.pixKey}
+            <br/>
+            ${table.vendor.name}
+          </p>
             </td>
           </tr>
           <tr>
@@ -76,7 +110,6 @@ export function generateFullTable(tableContent: FullTableContent): string {
               ${dayjs
                 .utc(table.date)
                 .tz("America/Sao_Paulo")
-                .subtract(3, "hour")
                 .format("DD/MM/YYYY")}
             </td>
           </tr>
@@ -93,7 +126,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
               Vendedor
             </td>
             <td class="tbodyColumn">
-              ${table.vendor}
+              ${table.vendor.name}
             </td>
           </tr>
           <tr>
@@ -146,7 +179,7 @@ export function generateFullTable(tableContent: FullTableContent): string {
             <td class="tbodyColumn">
               Observações
             </td>
-            <td class="tbodyColumn" style="background-color: red;">
+            <td class="tbodyColumn" style="background-color: red; text-align: left;">
               <p>
                 ${table.comments}
               </p>
@@ -196,20 +229,55 @@ export function generateFullTable(tableContent: FullTableContent): string {
       table {
         border: solid 1px black;
         border-collapse: collapse;
-        width: 100%;
+        width: 470px;
         height: 560px;
         max-height: 560px !important;
         display: table;
       }
   
       article {
-        width: 430px;
+        width: 470px;
+        height: 560px !important;
         max-height: 560px !important;
-        margin-right: 30px;
+        max-width: 470px;
+        margin-right: 10px;
         margin-bottom: 37px;
       }
   
-      p {
+      .vendorInfo {
+        background-color: red; 
+        max-width: 40px;
+        min-width: 40px;
+        text-align: center;
+        writing-mode: vertical-lr; 
+        padding-bottom: 50px;
+        padding-left: 10px;
+        z-index: 9999;
+        border-right: solid 1px black;
+        border-left: solid 1px black;
+        border-bottom: solid 1px black;
+      }
+
+      .vendorInfo p {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 18px;
+        font-weight: bold;
+        color: white; 
+        text-align: center;
+        -webkit-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+        display: block;
+        height: 100%;
+        width: 440px;
+        position: relative;
+        z-index: 9999;
+      }
+
+      .tbodyColumn p {
         padding-top: 5px;
         padding-bottom: 5px;
         overflow-wrap: normal;
@@ -236,7 +304,6 @@ export function generateFullTable(tableContent: FullTableContent): string {
   
       #imgCell {
         display: table-cell;
-        border: solid 1px black;
         width: 160px !important;
         max-width: 160px !important;
         max-height: 420px !important;

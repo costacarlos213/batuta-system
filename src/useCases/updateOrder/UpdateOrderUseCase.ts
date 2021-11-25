@@ -59,7 +59,7 @@ export class UpdateOrderUseCase {
     const order = Order.create({
       ...orderData,
       date: orderData.date || oldOrder.date,
-      vendor: orderData.vendor || oldOrder.vendor,
+      vendorId: orderData.vendorId || oldOrder.vendorId,
       total: parseFloat(total),
       id,
       files: {

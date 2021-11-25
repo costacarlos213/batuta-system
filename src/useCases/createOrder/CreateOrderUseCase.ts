@@ -1,4 +1,5 @@
 import { ObjectId } from "bson"
+import { IVendorRepository } from "../../repositories/userRepository/IVendorRepository"
 import { AllowedColors } from "../../entities/Order/IOrder"
 import { Order } from "../../entities/Order/Order"
 import { IOrderRepository } from "../../repositories/orderRepository/IOrderRepository"
@@ -8,15 +9,18 @@ import { ICreateOrderDTO } from "./CreateOrderDTO"
 export class CreateOrderUseCase {
   constructor(
     private orderRepository: IOrderRepository,
+    private vendorRepository: IVendorRepository,
     private tokenRepository: ITokenRepository
   ) {}
 
   async execute(orderData: ICreateOrderDTO): Promise<void> {
     const { files } = orderData
 
+    console.log(orderData)
+
     const orders = []
 
-    if (typeof orderData.vendor === "string") {
+    if (typeof orderData.vendorId === "string") {
       const id = new ObjectId()
 
       const fileNames = files.map(file => {
@@ -31,12 +35,28 @@ export class CreateOrderUseCase {
         return file.size
       })
 
+      if (
+        !orderData.vendorId ||
+        orderData.vendorId === "" ||
+        orderData.vendorId === "undefined"
+      ) {
+        throw new Error("Invalid Code")
+      }
+
+      const vendor = await this.vendorRepository.getNames({
+        id: orderData.vendorId
+      })
+
+      if (!vendor) {
+        throw new Error("Invalid Code")
+      }
+
       const code = await this.tokenRepository.get("code")
       const newCode = (parseInt(code) + 1).toLocaleString("en-US", {
         minimumIntegerDigits: 4,
         useGrouping: false
       })
-      const orderCod = `${orderData.vendor?.toString()[0]}${newCode}`
+      const orderCod = `${vendor[0].name[0]}${newCode}`
 
       let total = orderData.total
 
@@ -51,7 +71,7 @@ export class CreateOrderUseCase {
           description: orderData.description as string | undefined,
           payment: orderData.payment as string | undefined,
           phone: orderData.phone as string | undefined,
-          vendor: orderData.vendor as string | undefined,
+          vendorId: orderData.vendorId as string,
           total: parseFloat(total as string),
           address: orderData.address as string | undefined,
           delivery: orderData.delivery as string | undefined,
@@ -71,13 +91,29 @@ export class CreateOrderUseCase {
         key: "code",
         value: newCode.toString()
       })
-    } else if (typeof orderData.vendor === "object") {
-      for (let i = 0; i < orderData.vendor.length; i++) {
+    } else if (typeof orderData.vendorId === "object") {
+      for (let i = 0; i < orderData.vendorId.length; i++) {
         const id = new ObjectId()
 
         const fileNames = []
         const fileKeys = []
         const fileSizes = []
+
+        if (
+          !orderData.vendorId[i] ||
+          orderData.vendorId[i] === "" ||
+          orderData.vendorId[i] === "undefined"
+        ) {
+          throw new Error("Invalid Code")
+        }
+
+        const vendor = await this.vendorRepository.getNames({
+          id: orderData.vendorId[i]
+        })
+
+        if (!vendor) {
+          throw new Error("Invalid Code")
+        }
 
         files.forEach(file => {
           const fileFieldIndex = file.fieldname.slice(7).split("_")[1]
@@ -94,7 +130,7 @@ export class CreateOrderUseCase {
           minimumIntegerDigits: 4,
           useGrouping: false
         })
-        const orderCod = `${orderData.vendor[i][0]}${newCode}`
+        const orderCod = `${vendor[0].name[0]}${newCode}`
 
         let total = orderData.total[i]
 
@@ -109,7 +145,7 @@ export class CreateOrderUseCase {
             description: orderData.description[i],
             payment: orderData.payment[i],
             phone: orderData.phone[i],
-            vendor: orderData.vendor[i],
+            vendorId: orderData.vendorId[i],
             total: parseFloat(total),
             address: orderData.address[i],
             delivery: orderData.delivery[i],

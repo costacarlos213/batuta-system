@@ -13,7 +13,7 @@ export class Order {
   private constructor(
     public readonly Cod: Code,
     public readonly Comments: string = "",
-    public readonly Vendor?: StringType,
+    public readonly VendorId: string,
     public readonly CustomerName?: StringType,
     public readonly Description?: string,
     public readonly Total?: number,
@@ -48,7 +48,7 @@ export class Order {
     const {
       cod,
       customerName,
-      vendor,
+      vendorId,
       date,
       delivery,
       description,
@@ -69,7 +69,6 @@ export class Order {
 
     const formatedCustomerName = StringType.create(customerName?.trim())
     const formatedDelivery = StringType.create(delivery?.trim())
-    const formatedVendor = StringType.create(vendor?.trim())
     const formatedAddress = Address.create(address?.trim())
     const formatedPayment = StringType.create(payment?.trim())
     const formatedTitle = StringType.create(title?.trim())
@@ -79,7 +78,7 @@ export class Order {
     return new Order(
       formatedCode,
       comments,
-      formatedVendor,
+      vendorId,
       formatedCustomerName,
       description,
       total,

@@ -4,7 +4,6 @@ import { ISetDTO, ITokenRepository } from "../ITokenRepository"
 export class TokenRepository implements ITokenRepository {
   async set(keyValue: ISetDTO): Promise<void> {
     const { key, value } = keyValue
-
     redis.set(key, value)
   }
 

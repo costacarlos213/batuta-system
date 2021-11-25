@@ -49,7 +49,7 @@ export class PdfProvider implements IPdfProvider {
 
     const shrinkPdfPath = path.join(publicFolder, "shrinkpdf.sh")
 
-    await exec(`sh ${shrinkPdfPath} ${pdfPath} ${compressedPdfPath} 150`)
+    await exec(`sh ${shrinkPdfPath} ${pdfPath} ${compressedPdfPath} 140`)
 
     const pdfBuffer = await readFileSync(compressedPdfPath)
     await unlinkSync(pdfPath)

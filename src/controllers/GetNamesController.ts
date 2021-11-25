@@ -4,7 +4,7 @@ import { GetNamesUseCase } from "../useCases/getNames/GetNamesUseCase"
 export class GetNamesController {
   constructor(private getNamesUseCase: GetNamesUseCase) {}
 
-  async handler(req: Request, res: Response): Promise<Response> {
+  async handle(req: Request, res: Response): Promise<Response> {
     const filter = {
       id: req.query.id?.toString()
     }

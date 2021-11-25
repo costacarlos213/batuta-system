@@ -13,16 +13,30 @@ import { updateOrderController } from "./main/updateOrder"
 import { deleteOrderController } from "./main/deleteOrder"
 import { countOrdersController } from "./main/CountOrders"
 import { getNamesController } from "./main/getNames"
+import { deleteVendorController } from "./main/deleteVendor"
+import { updateVendorController } from "./main/updateVendor"
 
 const router = Router()
 
-router.post("/user", async (req: Request, res: Response) => {
+// User routes
+
+router.post("/user", verifyToken, async (req: Request, res: Response) => {
   return await createUserController.handle(req, res)
 })
 
-router.get("/user", async (req: Request, res: Response) => {
-  return await getNamesController.handler(req, res)
+router.get("/user", verifyToken, async (req: Request, res: Response) => {
+  return await getNamesController.handle(req, res)
 })
+
+router.put("/user", verifyToken, async (req: Request, res: Response) => {
+  return await updateVendorController.handle(req, res)
+})
+
+router.delete("/user", verifyToken, async (req: Request, res: Response) => {
+  return await deleteVendorController.handle(req, res)
+})
+
+// Order Routes
 
 router.post(
   "/order",
@@ -32,19 +46,19 @@ router.post(
   }
 )
 
-router.get("/order", async (req, res) => {
+router.get("/order", verifyToken, async (req, res) => {
   return await getOrdersController.handle(req, res)
 })
 
-router.get("/order/count", async (req, res) => {
+router.get("/order/count", verifyToken, async (req, res) => {
   return await countOrdersController.handle(res)
 })
 
-router.put("/order", uploadFileMiddleware, async (req, res) => {
+router.put("/order", [verifyToken, uploadFileMiddleware], async (req, res) => {
   return await updateOrderController.handle(req, res)
 })
 
-router.delete("/order", async (req, res) => {
+router.delete("/order", verifyToken, async (req, res) => {
   return await deleteOrderController.handle(req, res)
 })
 
@@ -61,6 +75,8 @@ router.delete("/auth/logout", verifyToken, async (req, res) => {
 router.get("/token", verifyRefreshToken, async (req, res) => {
   return await refreshTokenController.handle(req, res)
 })
+
+// PDF Routes
 
 router.post("/print", verifyToken, async (req, res) => {
   return await printSimpleController.handle(req, res)

@@ -20,17 +20,29 @@ export class CreateUserUseCase {
         error = new Error("Missing Name")
       }
 
+      console.log(pixType)
+
       if (
         pixType !== "randomKey" &&
         pixType !== "phone" &&
         pixType !== "cpf" &&
-        pixType !== "email"
+        pixType !== "email" &&
+        typeof pixType !== "undefined" &&
+        pixType !== ""
       ) {
         error = new Error("Unknown Pix Type")
       }
 
+      const normalizedName = name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+
+      console.log(normalizedName)
+
       if (!validEmail || validEmail.length === 0) {
-        validEmail = `${name}${Math.floor(
+        validEmail = `${normalizedName
+          .toLowerCase()
+          .replace(/\s/g, "")}${Math.floor(
           Math.random() * 10000 + 1
         )}@batutawind.com`
       }

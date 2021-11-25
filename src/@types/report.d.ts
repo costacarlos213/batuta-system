@@ -8,7 +8,7 @@ export interface IFilters {
   customerName?: string
   phone?: string
   address?: string
-  vendor?: string
+  vendorId?: string
   description?: string
   payment?: string
   delivery?: string

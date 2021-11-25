@@ -7,7 +7,7 @@ export class LogoutController {
   async handle(req: Request, res: Response): Promise<Response> {
     try {
       await this.logoutUseCase.execute({
-        token: req.body.token,
+        token: req.headers.token as string,
         userId: req.body.userData.sub
       })
 

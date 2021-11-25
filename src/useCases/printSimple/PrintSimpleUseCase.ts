@@ -34,7 +34,7 @@ export class PrintSimpleUseCase {
 
       margin = {
         top: "2.5cm",
-        left: "1cm",
+        left: "15px",
         bottom: "2cm"
       }
       scale = 0.8

@@ -16,8 +16,6 @@ export class CreateOrderController {
     }
 
     try {
-      console.log("Creating...")
-
       await this.createOrderUseCase.execute({
         ...orderData,
         files: req.files

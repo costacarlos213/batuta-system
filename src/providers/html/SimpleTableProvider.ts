@@ -32,7 +32,7 @@ export function generateSimpleTable(tableContent: SimpleTableContent): string {
             ${row.customerName}
           </td>
           <td class="tbodyColumn">
-            ${row.vendor}
+            ${row.vendor.name}
           </td>
           <td class="tbodyColumn">
             ${row.description}

@@ -10,7 +10,8 @@
       * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
+        overflow: hidden;
         font-family: Arial, Helvetica, sans-serif;
       }
       
@@ -23,20 +24,63 @@
       table {
         border: solid 1px black;
         border-collapse: collapse;
-        width: 100%;
+        width: 430px;
         height: 560px;
+        max-height: 560px !important;
         display: table;
       }
   
       article {
-        width: 430px;
+        width: 450px;
+        height: 560px !important;
+        max-height: 560px !important;
         margin-right: 30px;
-        margin-bottom: 40px;
+        margin-bottom: 37px;
+        border: 1px solid black;
       }
   
+      .vendorInfo {
+        background-color: red; 
+        text-orientation: mixed; 
+        writing-mode: vertical-lr; 
+        color: white; 
+        transform: rotateZ(180deg); 
+        text-align: center;
+        align-items: flex-start;
+        overflow: hidden;
+        padding-left: 1px;
+        padding-right: 1px;
+        font-size: 18px;
+        height: 500px !important;
+        font-weight: normal;
+        line-height: 30px;
+        border-right: 1px solid black;
+      }
+
+      .vendorInfo p {
+        overflow: hidden;
+        height: 100%;
+        min-height: 560px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        justify-content: flex-start;
+        align-items: flex-start;
+        overflow: visible;
+        -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+
+      }
+
       p {
+        padding-top: 5px;
+        padding-bottom: 5px;
         overflow-wrap: normal;
         font-family: Arial, Helvetica, sans-serif;
+        overflow: hidden;
+        max-height: 70px;
       }
   
       .tbodyColumn {
@@ -47,7 +91,7 @@
         border: solid 1px black;
         text-align: center;
         width: 120px;
-        font-size: medium;
+        font-size: 14.5px;
         font-family: Arial, Helvetica, sans-serif;
       }
   
@@ -58,38 +102,40 @@
       #imgCell {
         display: table-cell;
         border: solid 1px black;
-        width: 160px;
-        height: 380px;
+        width: 160px !important;
+        max-width: 160px !important;
+        max-height: 420px !important;
+        height: 420px;
         padding: 1px;
+        border: 1px solid black;
       }
   
       img {
-        max-height: 320px;
+        max-height: 360px;
+        max-width: 160px;
         object-fit: contain;
       }
 
       .rotatedImage {
         transform: rotate(90deg);
-        outline: 1px solid green;
-        height: 100px !important;
+        max-height: 160px;
+        max-width: 100px;
       }
   
       .flexChildren {
-        height: 50px;
-        width: min-content;
         display: flex;
         justify-content: center;
         align-items: center;
-        outline: 1px solid blue;
+        max-width: 160px;
+        max-height: 100px;
       }
 
       .flex {
         display: flex;
         flex-direction: column;
         align-items: center;
-        outline: 1px solid red;
         flex-wrap: wrap;
-        height: 100%;
+        height: 100% !important;
       }
     </style>
   </head>
@@ -98,10 +144,12 @@
       <article>
         <table>
           <thead>
-            <th colspan="3" style="background-color: green">
+            <th colspan="3" style="background-color: yellow">
               <h1>
-                Kit grande
+                Kit Grande
               </h1>
+            </th>
+            <th colspan="3" style="background-color: red; width: 100%; border-left: 1px solid black;">
             </th>
           </thead>
           <tbody>
@@ -110,12 +158,16 @@
                 Cód
               </td>
               <td class="tbodyColumn">
-                C0001
+                C00001
               </td>
               <td id="imgCell" rowspan="10">
-                <div class="flex">
+                <div class="flex" style="justify-content: flex-start;">
                   <img src="../../../../../../Desktop/bebidas.png"/>
                 </div>
+              </td>
+              <td rowspan="11" class="vendorInfo">
+              <p>Chave Pix - Email: carloscosta2912@gmail.com</p>
+              <p>Jilhos</p>
               </td>
             </tr>
             <tr>
@@ -146,9 +198,9 @@
               <td class="tbodyColumn">
                 Descrição
               </td>
-              <td class="tbodyColumn" style="background-color: green">
+              <td class="tbodyColumn" style="background-color: yellow">
                 <p>
-                Kit bandeira 3 metros
+                  Kit bandeira 3 metros
                 </p>
               </td>
             </tr>
@@ -157,14 +209,14 @@
                 Celular
               </td>
               <td class="tbodyColumn">
-              (11) 94550-8106
+                (11) 94550-8106
               </td>
             </tr>
             <tr>
               <td class="tbodyColumn">
                 A Pagar
               </td>
-              <td class="tbodyColumn" style="background-color: green">
+              <td class="tbodyColumn" style="background-color: yellow">
                 R$ 1250.56
               </td>
             </tr>
@@ -178,7 +230,7 @@
             </tr>
             <tr>
               <td class="tbodyColumn">
-                Forma de entrega
+                Entrega 
               </td>
               <td class="tbodyColumn">
                 Transportadora
@@ -188,239 +240,19 @@
               <td class="tbodyColumn">
                 Observações
               </td>
-              <td class="tbodyColumn">
+              <td class="tbodyColumn" style="background-color: red;">
                 <p>
-                  Grande campo de observações o uqalessa é uma observação
-                  CEP: 02913-000
-                  CPF: 436.616.758-18
+                  Grande campo de observações o uqalessa é uma observação CEP: 02913-000 CPF: 436.616.758-18
                 </p>
               </td>
             </tr>
             <tr>
-              <td class="tbodyColumn">
+              <td class="tbodyColumn" style="padding-bottom: 0.5rem; padding-top: 0.5rem;">
                 Endereço
               </td>
-              <td class="tbodyColumn" colspan="2" style="padding-bottom: 10px; background-color: green">
+              <td class="tbodyColumn" colspan="2" style="background-color: yellow">
                 <p>
-                  Rua Pedro Cubas, 149 - Casa 9
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </article> 
-      <article>
-        <table>
-          <thead>
-            <th colspan="3" style="background-color: green">
-              <h1>
-                Kit grande
-              </h1>
-            </th>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="tbodyColumn">
-                Cód
-              </td>
-              <td class="tbodyColumn">
-                C0001
-              </td>
-              <td id="imgCell" rowspan="9">
-                <div class="flex">
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Data
-              </td>
-              <td class="tbodyColumn">
-                29/12/2004
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Nome
-              </td>
-              <td class="tbodyColumn">
-                Carlos
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Vendedor
-              </td>
-              <td class="tbodyColumn">
-                Jilhos
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Descrição
-              </td>
-              <td class="tbodyColumn" style="background-color: green">
-                <p>
-                Kit bandeira 3 metros
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Celular
-              </td>
-              <td class="tbodyColumn">
-              (11) 94550-8106
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                A Pagar
-              </td>
-              <td class="tbodyColumn" style="background-color: green">
-                R$ 1250.56
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Forma de pag
-              </td>
-              <td class="tbodyColumn">
-                Cartão de crédito
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Forma de entrega
-              </td>
-              <td class="tbodyColumn">
-                Transportadora
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Endereço
-              </td>
-              <td class="tbodyColumn" colspan="2" style="padding-bottom: 10px; background-color: green">
-                <p>
-                  Rua Pedro Cubas, 149 - Casa 9
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </article>
-      <article>
-        <table>
-          <thead>
-            <th colspan="3" style="background-color: green">
-              <h1>
-                Kit grande
-              </h1>
-            </th>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="tbodyColumn">
-                Cód
-              </td>
-              <td class="tbodyColumn">
-                C0001
-              </td>
-              <td id="imgCell" rowspan="9">
-                <div class="flex">
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                  <div class="flexChildren"><img class="rotatedImage" src="../../../../../../Desktop/bebidas.png"/></div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Data
-              </td>
-              <td class="tbodyColumn">
-                29/12/2004
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Nome
-              </td>
-              <td class="tbodyColumn">
-                Carlos
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Vendedor
-              </td>
-              <td class="tbodyColumn">
-                Jilhos
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Descrição
-              </td>
-              <td class="tbodyColumn" style="background-color: green">
-                <p>
-                Kit bandeira 3 metros
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Celular
-              </td>
-              <td class="tbodyColumn">
-              (11) 94550-8106
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                A Pagar
-              </td>
-              <td class="tbodyColumn" style="background-color: green">
-                R$ 1250.56
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Forma de pag
-              </td>
-              <td class="tbodyColumn">
-                Cartão de crédito
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Forma de entrega
-              </td>
-              <td class="tbodyColumn">
-                Transportadora
-              </td>
-            </tr>
-            <tr>
-              <td class="tbodyColumn">
-                Endereço
-              </td>
-              <td class="tbodyColumn" colspan="2" style="padding-bottom: 10px; background-color: green">
-                <p>
-                  Rua Pedro Cubas, 149 - Casa 9
+                  Rua Pedro Cubas, 149 - Casa 9${table.address}
                 </p>
               </td>
             </tr>

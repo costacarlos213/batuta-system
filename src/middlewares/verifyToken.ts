@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { verify } from "jsonwebtoken"
-import { Role } from "../entities/Vendor/IVendor"
+import { Role } from "../@types/vendor"
 import { TokenRepository } from "../repositories/tokenRepository/implementation/TokenRepository"
 
 export async function verifyToken(
@@ -27,11 +27,8 @@ export async function verifyToken(
       process.env.JWT_AUTH_SECRET
     )) as { sub: string; role: Role }
 
-    req.body = {
-      ...req.body,
-      userData: decoded,
-      token
-    }
+    req.headers.token = token
+    req.body.userData = decoded
 
     if (decoded.role === "vendor") {
       return res.status(401).json({ message: "Invalid vendor operation" })

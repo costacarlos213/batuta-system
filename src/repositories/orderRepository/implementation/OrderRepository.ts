@@ -4,7 +4,11 @@ import { Order } from "../../../entities/Order/Order"
 import { Order as PrismaOrder } from "@prisma/client"
 import aws from "aws-sdk"
 
-import { IOrderId, IOrderRepository } from "../IOrderRepository"
+import {
+  IOrderId,
+  IOrderRepository,
+  IOrderWithVendor
+} from "../IOrderRepository"
 
 export class OrderRepository implements IOrderRepository {
   async getUnique(id: string): Promise<PrismaOrder> {
@@ -17,7 +21,7 @@ export class OrderRepository implements IOrderRepository {
     return orders
   }
 
-  async get(filters: IFilters): Promise<PrismaOrder[]> {
+  async get(filters: IFilters): Promise<IOrderWithVendor[]> {
     const orders = await prisma.order.findMany({
       take: 60,
       orderBy: {
@@ -50,7 +54,7 @@ export class OrderRepository implements IOrderRepository {
             id: { equals: filters?.id }
           },
           {
-            vendor: { equals: filters?.vendor }
+            vendorId: { equals: filters?.vendorId }
           },
           {
             title: { contains: filters?.title }
@@ -65,6 +69,16 @@ export class OrderRepository implements IOrderRepository {
             }
           }
         ]
+      },
+      include: {
+        vendor: {
+          select: {
+            pixType: true,
+            id: true,
+            pixKey: true,
+            name: true
+          }
+        }
       }
     })
 
@@ -72,11 +86,10 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async save(orders: Order[]): Promise<void> {
-    const ordersObjectsArray = []
+    const ordersObjectsArray: PrismaOrder[] = []
 
     orders.map(order => {
       return ordersObjectsArray.push({
-        vendor: order.Vendor.value,
         address: order.Address.value,
         cod: order.Cod.value,
         customerName: order.CustomerName.value,
@@ -91,6 +104,7 @@ export class OrderRepository implements IOrderRepository {
         fileKeys: order.Files.fileKeys,
         fileSizes: order.Files.fileSizes,
         id: order.id.toHexString(),
+        vendorId: order.VendorId,
         title: order.Title.value,
         color: order.Color
       })
@@ -124,7 +138,7 @@ export class OrderRepository implements IOrderRepository {
         id: order.id.toHexString()
       },
       data: {
-        vendor: order.Vendor.value,
+        vendorId: order.VendorId,
         address: order.Address.value,
         cod: order.Cod.value,
         customerName: order.CustomerName.value,

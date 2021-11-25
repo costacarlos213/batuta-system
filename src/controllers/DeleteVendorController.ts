@@ -1,25 +1,25 @@
 import { Request, Response } from "express"
-import { DeleteOrderUseCase } from "../useCases/deleteOrder/DeleteOrderUseCase"
+import { DeleteVendorUseCase } from "../useCases/deleteVendor/DeleteVendorUseCase"
 
-export class DeleteOrderController {
-  constructor(private deleteOrderUseCase: DeleteOrderUseCase) {}
+export class DeleteVendorController {
+  constructor(private deleteVendorUseCase: DeleteVendorUseCase) {}
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const orderIds = req.body
+    const vendorIds = req.body
 
-    if (orderIds.userData) {
-      delete orderIds.userData
-      delete orderIds.token
+    if (vendorIds.userData) {
+      delete vendorIds.userData
+      delete vendorIds.token
     }
 
-    if (!orderIds) {
+    if (!vendorIds) {
       return res.status(400).json({
         message: "Missing data."
       })
     }
 
     try {
-      await this.deleteOrderUseCase.execute(orderIds)
+      await this.deleteVendorUseCase.execute(vendorIds)
 
       return res.status(200).json({
         message: "Deleted."
