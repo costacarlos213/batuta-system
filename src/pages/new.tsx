@@ -45,7 +45,7 @@ const New: React.FC = () => {
             comments: '',
             color: 'green',
             title: '',
-            vendor: ''
+            vendorId: ''
           }
         ]
       }
@@ -99,8 +99,6 @@ const New: React.FC = () => {
             setError('Campo "vendedor" inválido.')
           } else if (message === 'Invalid Phone') {
             setError('Campo "telefone" inválido.')
-          } else {
-            setError(message)
           }
         }
       })
@@ -128,7 +126,7 @@ const New: React.FC = () => {
       payment: '',
       phone: '',
       total: undefined,
-      vendor: '',
+      vendorId: undefined,
       color: 'green',
       title: '',
       comments: ''

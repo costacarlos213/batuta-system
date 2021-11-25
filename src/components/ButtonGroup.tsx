@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 
-import { Flex, Button, Spinner } from '@chakra-ui/react'
+import { Button, Spinner, Stack } from '@chakra-ui/react'
 import { useRouter } from 'next/dist/client/router'
-import { IOrder } from 'src/pages/order/[id]'
 import { api } from 'src/services/api'
+
+import { IOrder } from '../../@types/pedidos'
 
 interface IButtonGroup {
   printData: IOrder[]
@@ -109,14 +110,13 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
   }
 
   return (
-    <Flex flexDirection="row" alignItems="center">
+    <Stack direction="row" alignItems="center" spacing="3" mb="5" w="xl">
       <Button
         onClick={handlePrintButton}
         disabled={isLoading}
-        px="5"
-        mb="2"
+        px="3"
         fontWeight="medium"
-        fontSize="md"
+        fontSize="sm"
         backgroundColor="gray.100"
         _hover={{
           backgroundColor: 'gray.300'
@@ -127,12 +127,10 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
       <Button
         onClick={handleGenerateReportButton}
         disabled={isLoading}
-        ml="6"
-        mb="2"
         fontWeight="semibold"
-        fontSize="md"
+        fontSize="sm"
         backgroundColor="whatsapp.500"
-        px="5"
+        px="3"
         color="white"
         _hover={{
           backgroundColor: 'whatsapp.400'
@@ -142,23 +140,22 @@ const ButtonGroup: React.FC<IButtonGroup> = ({
       </Button>
       <Button
         onClick={openModal}
-        px="5"
-        ml="5"
-        mb="2"
+        px="3"
         hidden={!checkedFields.find(item => typeof item !== 'boolean')}
         disabled={isLoading}
         fontWeight="semibold"
         fontSize="sm"
         color="white"
         backgroundColor="red.500"
+        transition="ease-in-out"
         _hover={{
           backgroundColor: 'red.600'
         }}
       >
         Excluir
       </Button>
-      <Spinner hidden={!isLoading} size="sm" mb="2" ml="5" />
-    </Flex>
+      <Spinner hidden={!isLoading} size="sm" ml="5" />
+    </Stack>
   )
 }
 

@@ -23,6 +23,11 @@ const FormInput: React.FC<IFormInput> = ({ ...rest }) => {
       _focus={{
         shadow: 0
       }}
+      _disabled={{
+        border: '1px solid rgba(91, 91, 91, 1);',
+        color: 'blackAlpha.700'
+      }}
+      color="black"
       sx={{
         '&:placeholder-shown': {
           bgColor: '#d2d2d2'

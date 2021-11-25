@@ -9,13 +9,18 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 import axios from 'axios'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { useRouter } from 'next/dist/client/router'
+import {
+  GetServerSideProps,
+  GetServerSidePropsResult,
+  InferGetServerSidePropsType
+} from 'next'
 import Link from 'next/link'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import UsersTable from 'src/components/UsersTable'
 import { api } from 'src/services/api'
+import { handleMultipleVendorDelete } from 'src/utils/deleteMultipleVendors'
 
+import { IVendorFields } from '../../../@types/vendor'
 import ModalContent from '../../components/ExcludeModal'
 
 const AllUsers: React.FC = ({
@@ -23,8 +28,6 @@ const AllUsers: React.FC = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [checked, setChecked] = useState(new Array(users.length).fill(false))
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const router = useRouter()
 
   return (
     <Box
@@ -46,6 +49,7 @@ const AllUsers: React.FC = ({
       >
         <ModalOverlay />
         <ModalContent
+          deleteFunction={handleMultipleVendorDelete}
           onClose={onClose}
           checkedFields={checked}
           title="Você deseja mesmo apagar esse pedido?"
@@ -159,10 +163,20 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             }
           }
         }
+      } else {
+        destroyCookie({ res: ctx.res }, 'JID', {
+          httpOnly: true,
+          path: '/'
+        })
+
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false
+          }
+        }
       }
-      /* eslint-disable */
-    })) as any
-    /* eslint-enable */
+    })) as GetServerSidePropsResult<IVendorFields>
 }
 
 export default AllUsers

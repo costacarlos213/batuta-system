@@ -4,12 +4,11 @@ interface FormValues {
   delivery: string
   customerName: string
   phone: string
-  vendor: string
   total: number
   payment: string
   address: string
   description: string
-  vendor: string
+  vendorId: string
   initialDate: string
   finalDate: string
   comments: string
@@ -30,7 +29,31 @@ export interface ISearchForm {
   payment: string
   phone: string
   total: number
-  vendor: string
+  vendorId: string
   initialDate: string
   finalDate: string
+}
+
+export interface IOrder {
+  address: string
+  cod: string
+  color: 'green' | 'yellow'
+  title: string
+  comments: string
+  customerName: string
+  date: string
+  delivery: string
+  description: string
+  fileNames: string[]
+  id: string
+  payment: string
+  phone: string
+  total: string
+  vendorId: string
+  vendor: {
+    pixType: string
+    pixKey: string
+    name: string
+    id: string
+  }
 }

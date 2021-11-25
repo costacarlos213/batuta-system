@@ -11,6 +11,7 @@ interface IReactSelect {
   mr?: string | string[]
   ml?: string | string[]
   defaultOptions: OptionTypeBase[]
+  defaultLabel?: string
   defaultValue?: string
   disabled?: boolean
   width?: string | string[]
@@ -26,6 +27,7 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
   disabled = false,
   creatable = true,
   defaultOptions,
+  defaultLabel,
   defaultValue,
   descWatch,
   ml,
@@ -43,9 +45,7 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
   const boxRef = useRef<HTMLDivElement>(null)
   const [options, setOptions] = useState<OptionTypeBase[]>(defaultOptions || [])
   const [selectValue, setValue] = useState<OptionTypeBase | null>(
-    hasDefaultValue === true
-      ? { label: defaultValue, value: defaultValue }
-      : null
+    hasDefaultValue ? { label: defaultLabel, value: defaultValue } : null
   )
 
   function capitalizeFirstLetter(value: string) {
@@ -60,10 +60,7 @@ const ChakraReactSelect: React.FC<IReactSelect & UseFormRegisterReturn> = ({
     }
   ) => {
     if (actionMeta.action === 'clear') {
-      setValue({
-        label: capitalizeFirstLetter(placeholder),
-        value: capitalizeFirstLetter(placeholder)
-      })
+      setValue(null)
     } else if (actionMeta.action === 'select-option') {
       setValue({
         label: newValue.label,

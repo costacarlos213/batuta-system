@@ -2,12 +2,19 @@ import React, { useState } from 'react'
 
 import { Box, ModalOverlay, useDisclosure, Modal } from '@chakra-ui/react'
 import axios from 'axios'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import {
+  GetServerSideProps,
+  GetServerSidePropsResult,
+  InferGetServerSidePropsType
+} from 'next'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
 import ModalContent from 'src/components/ExcludeModal'
 import Table from 'src/components/Table'
 import { api } from 'src/services/api'
+import { handleMultipleDelete } from 'src/utils/deleteMultiple'
+
+import { IOrder } from '../../../@types/pedidos'
 
 const Query: React.FC = ({
   orders
@@ -35,6 +42,7 @@ const Query: React.FC = ({
       >
         <ModalOverlay />
         <ModalContent
+          deleteFunction={handleMultipleDelete}
           onClose={onClose}
           checkedFields={checked}
           title="Você deseja mesmo apagar esse pedido?"
@@ -129,9 +137,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
           }
         }
       }
-      /* eslint-disable */
-    })) as any
-    /* eslint-enable */
+    })) as GetServerSidePropsResult<IOrder[]>
 }
 
 export default Query

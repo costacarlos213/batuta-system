@@ -1,192 +1,143 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Edit2, Save, Trash2 } from 'react-feather'
 import { useForm } from 'react-hook-form'
 
 import {
   Box,
-  Flex,
   Heading,
-  Spinner,
-  Button,
-  Icon,
-  Modal,
+  Text,
   useDisclosure,
-  ModalOverlay,
-  Textarea,
-  Stack
+  Stack,
+  FormControl,
+  Button,
+  Flex,
+  Icon,
+  Spinner,
+  Modal,
+  ModalOverlay
 } from '@chakra-ui/react'
 import axios from 'axios'
-import dayjs from 'dayjs'
-import tz from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import {
+  GetServerSideProps,
+  GetServerSidePropsResult,
+  InferGetServerSidePropsType
+} from 'next'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
+import ChakraReactSelect from 'src/components/ChakraReactSelect'
 import ModalContent from 'src/components/ExcludeModal'
-import FieldsContainer from 'src/components/FieldsContainer'
-import FileUpload from 'src/components/FileUpload'
 import { api } from 'src/services/api'
-import { validateFiles } from 'src/utils/validateFiles'
+import { handleMultipleVendorDelete } from 'src/utils/deleteMultipleVendors'
 
-import { IFormValues } from '../../../@types/vendor'
+import { IVendorFields } from '../../../@types/vendor'
 import Input from '../../components/FormInput'
 
 const Vendor: React.FC = ({
-  order
+  vendor
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isDisabled, setIsDisabled] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const router = useRouter()
 
-  const { register, handleSubmit, control, watch, formState } =
-    useForm<IFormValues>({
-      defaultValues: {
-        pedidos: [
-          {
-            cod: order.cod,
-            address: order.address,
-            customerName: order.customerName,
-            delivery: order.delivery,
-            description: order.description,
-            file_: undefined,
-            payment: order.payment,
-            phone: order.phone,
-            total: order.total,
-            comments: order.comments,
-            vendor: order.vendor,
-            color: order.color,
-            title: order.title,
-            initialDate: order.date
-          }
-        ]
-      }
-    })
-  const urlToFile = async (urls: string[]) => {
-    const clipboard = new ClipboardEvent('').clipboardData || new DataTransfer()
+  let pixLabel: string
 
-    await urls.forEach(async url => {
-      const response = await fetch(url, {
-        mode: 'cors'
-      })
+  switch (vendor.pixType) {
+    case 'cpf':
+      pixLabel = 'Cpf'
+      break
 
-      const blob = await response.blob()
-      const file = new File([blob], decodeURI(url.split('%40')[1]), {
-        type: blob.type
-      })
+    case 'email':
+      pixLabel = 'Email'
+      break
 
-      clipboard.items.add(file)
+    case 'phone':
+      pixLabel = 'Telefone'
+      break
 
-      setFiles(Array.from(clipboard.files))
-    })
+    case 'randomKey':
+      pixLabel = 'Chave Aleatória'
+      break
+
+    default:
+      pixLabel = 'unset'
+      break
   }
-  useEffect(() => {
-    urlToFile(order.fileKeys)
-  }, [])
 
-  const phoneWatch = watch('pedidos.0.phone')
-  const titleWatch = watch('pedidos.0.title')
+  const { register, handleSubmit, control } = useForm<IVendorFields>({
+    defaultValues: {
+      vendors: [
+        {
+          id: vendor.id,
+          name: vendor.name,
+          email: vendor.email,
+          pixType: vendor.pixType,
+          pixKey: vendor.pixKey
+        }
+      ]
+    }
+  })
 
   const handleEdit = () => {
     setIsDisabled(false)
   }
+
   const handleUpdate = handleSubmit(async data => {
-    const formData = data.pedidos[0]
+    const formData = data.vendors[0]
 
     setIsLoading(true)
     setIsDisabled(true)
-
-    const deletedFiles: string[] = []
-    const insertedFiles: File[] = []
-
-    for (let index = 0; index < order.fileNames.length; index++) {
-      let exists = false
-
-      for (let i = 0; i < formData.file_.length; i++) {
-        if (
-          order.fileNames[index].split('@')[1] === formData.file_[i].name &&
-          order.fileSizes[index] === formData.file_[i].size
-        ) {
-          exists = true
-        }
-      }
-
-      if (!exists) {
-        deletedFiles.push(order.fileNames[index])
-      }
-    }
-
-    await Array.from(formData.file_).forEach(file => {
-      let index = false
-
-      for (let i = 0; i < order.fileNames.length; i++) {
-        if (index) {
-          return
-        }
-
-        if (
-          order.fileNames[i].split('@')[1] === file.name &&
-          order.fileSizes[i] === file.size
-        ) {
-          index = true
-        } else {
-          index = false
-        }
-      }
-
-      if (!index) insertedFiles.push(file)
-    })
-
-    const apiData = new FormData()
-    apiData.append('id', order.id)
-
-    Object.keys(formData).forEach(key => {
-      if (key === 'file_') {
-        for (let i = 0; i < insertedFiles.length; i++) {
-          apiData.append(`insertedFiles_${i}`, insertedFiles[i])
-        }
-
-        apiData.append('deletedFiles', JSON.stringify(deletedFiles))
-      } else if (key === 'phone') {
-        apiData.append('phone', formData[key].toString().replace(/\D+/g, ''))
-      } else if (key === 'initialDate') {
-        const date = dayjs
-          .utc(formData[key as keyof FormValues] as string)
-          .tz('America/Sao_Paulo')
-          .format()
-
-        apiData.append(key, date)
-      } else {
-        apiData.append(key, formData[key as keyof FormValues]?.toString())
-      }
-    })
-
     api
-      .put('/api/updateOrder', apiData)
-      .then(response => {
-        console.log(response.data)
+      .put('/api/updateVendor', formData)
+      .then(() => {
+        setError('')
       })
       .catch(err => {
         if (err?.response?.status === 401) {
           router.push('/')
         } else {
-          console.log(err)
+          switch (err?.response?.data.message) {
+            case "Email can't be null.":
+              setError('"Email" não pode ser nulo.')
+              break
+
+            case "Name can't be null.":
+              setError('"Nome" não pode ser nulo.')
+              break
+
+            default:
+              setError('')
+              break
+          }
         }
       })
       .finally(() => setIsLoading(false))
   })
+
+  const pixTypeOptions = [
+    { label: 'Chave Aleatória', value: 'randomKey' },
+    { label: 'Email', value: 'email' },
+    { label: 'Telefone', value: 'phone' },
+    { label: 'Cpf', value: 'cpf' }
+  ]
 
   return (
     <Box
       as="main"
       ml={['0', '0', '2']}
       bg="white"
-      display="block"
+      display="flex"
+      flexDirection="column"
       w="full"
+      h="full"
       mt={['2', '2', '0']}
-      p={['3', '3', '5']}
+      pt={['3', '3', '5']}
+      pl={['5', '5', '10']}
+      pr="5"
+      justifyContent={['center', 'center', 'flex-start']}
       overflowX={['scroll', 'scroll', 'hidden']}
     >
       <Modal
@@ -198,161 +149,161 @@ const Vendor: React.FC = ({
       >
         <ModalOverlay />
         <ModalContent
+          deleteFunction={handleMultipleVendorDelete}
           onClose={onClose}
-          checkedFields={[order]}
+          checkedFields={[vendor]}
           title="Você deseja mesmo apagar esse pedido?"
         />
       </Modal>
-      <Flex
-        flexDirection={['column', 'row']}
-        width={['full', 'xl', 'xl', '2xl', '4xl']}
-        alignItems={['center', 'center', 'flex-start']}
-        justifyContent="space-between"
-        mb="3"
+      <form
+        style={{
+          height: '100%'
+        }}
+        id="newForm"
       >
-        <Heading as="header" fontWeight="medium" fontSize="x-large" mb="6">
-          Dados do pedido
-        </Heading>
         <Flex
-          direction={['column-reverse', 'column-reverse', 'row']}
-          alignItems="center"
-          justifyContent="center"
+          flexDirection={['column', 'row']}
+          width={['full', 'xl', 'xl', '2xl', '4xl']}
+          alignItems={['center', 'center', 'flex-start']}
+          justifyContent="space-between"
+          mb="3"
         >
-          <Spinner
-            zIndex="9999"
-            size="sm"
-            mr={['0', '0', '5']}
-            visibility={isLoading ? 'visible' : 'hidden'}
-            display="block"
-          />
-          <Stack
-            spacing={5}
-            direction="row"
+          <Heading as="header" fontWeight="medium" fontSize="x-large" mb="6">
+            Dados do vendedor
+          </Heading>
+          <Flex
+            direction={['column-reverse', 'column-reverse', 'row']}
             alignItems="center"
-            mb={['6', '6', '0']}
+            justifyContent="center"
           >
-            {isDisabled && (
-              <Button
-                disabled={isLoading}
-                onClick={handleEdit}
-                px="3"
-                backgroundColor="gray.100"
-                _hover={{
-                  backgroundColor: 'gray.300'
-                }}
-              >
-                <Icon as={Edit2} mr="2" />
-                Editar
-              </Button>
-            )}
-            {!isDisabled && (
-              <Button
-                disabled={isLoading}
-                onClick={handleUpdate}
-                type="submit"
-                backgroundColor="whatsapp.500"
-                px="3"
-                color="white"
-                _hover={{
-                  backgroundColor: 'green.400'
-                }}
-              >
-                <Icon as={Save} mr="2" />
-                Salvar
-              </Button>
-            )}
-            <Button
-              onClick={onOpen}
-              isDisabled={isLoading}
-              backgroundColor="red.500"
-              _hover={{
-                backgroundColor: 'red.600'
-              }}
+            <Spinner
+              zIndex="9999"
+              size="sm"
+              mr={['0', '0', '5']}
+              display={isLoading ? 'block' : 'none'}
+            />
+            <Stack
+              spacing={5}
+              direction="row"
+              alignItems="center"
+              mb={['6', '6', '0']}
             >
-              <Icon as={Trash2} color="white" />
-            </Button>
-          </Stack>
+              {isDisabled && (
+                <Button
+                  disabled={isLoading}
+                  onClick={handleEdit}
+                  px="3"
+                  backgroundColor="gray.100"
+                  _hover={{
+                    backgroundColor: 'gray.300'
+                  }}
+                >
+                  <Icon as={Edit2} mr="2" />
+                  Editar
+                </Button>
+              )}
+              {!isDisabled && (
+                <Button
+                  disabled={isLoading}
+                  onClick={handleUpdate}
+                  type="submit"
+                  backgroundColor="whatsapp.500"
+                  px="3"
+                  color="white"
+                  _hover={{
+                    backgroundColor: 'green.400'
+                  }}
+                >
+                  <Icon as={Save} mr="2" />
+                  Salvar
+                </Button>
+              )}
+              <Button
+                onClick={onOpen}
+                isDisabled={isLoading}
+                backgroundColor="red.500"
+                _hover={{
+                  backgroundColor: 'red.600'
+                }}
+              >
+                <Icon as={Trash2} color="white" />
+              </Button>
+            </Stack>
+          </Flex>
         </Flex>
-      </Flex>
-
-      <Input
-        cursor={'not-allowed'}
-        placeholder="Código"
-        isDisabled={isDisabled}
-        _disabled={{
-          color: 'gray.200'
-        }}
-        width={['full', 'full', 'sm']}
-        defaultValue={order.cod}
-        mb="3"
-        sx={{
-          '&:placeholder-shown': {
-            bgColor: '#d2d2d2'
-          }
-        }}
-        {...register('pedidos.0.cod', {
-          minLength: 4,
-          required: false,
-          pattern: /^[A-Z]\d+$/s
-        })}
-      />
-      <FieldsContainer
-        disabled={isDisabled}
-        defaultValues={order}
-        index={0}
-        register={register}
-        phoneWatch={phoneWatch}
-        titleWatch={titleWatch}
-        control={control}
-        formState={formState}
-      >
-        <Input
-          placeholder="Data inicial"
-          mr={['0', '0', '6']}
-          type="date"
-          mb={['5', '5', '0']}
-          defaultValue={dayjs.utc(order.date).format().split('T')[0]}
-          width="2xs"
-          {...register('pedidos.0.initialDate')}
-        />
-        <Textarea
-          placeholder="Observações"
-          resize="none"
-          defaultValue={order.comments}
-          size="md"
-          h={['unset', 'unset', '32']}
-          w={['full', 'full', 'xl']}
-          _placeholder={{
-            color: 'gray.200'
-          }}
-          borderColor="gray.500"
-          _hover={{
-            borderColor: '#B3B3B3'
-          }}
-          _focus={{
-            shadow: 0
-          }}
-          sx={{
-            '&:placeholder-shown': {
-              bgColor: '#d2d2d2'
-            }
-          }}
-          {...register('pedidos.0.comments', {
-            required: false,
-            maxLength: 250
-          })}
-        />
-        <FileUpload
+        <FormControl
           disabled={isDisabled}
-          defaultValue={files}
-          accept="image/*"
-          register={register('pedidos.0.file_', {
-            validate: validateFiles,
-            required: false
-          })}
-          multiple
-        />
-      </FieldsContainer>
+          opacity={isDisabled ? 0.8 : 1}
+          cursor={isDisabled ? 'not-allowed' : 'default'}
+          as="fieldset"
+          w="full"
+          form="newForm"
+          borderColor="#dfdfdf"
+          pb="6"
+        >
+          <Stack spacing="5" width={['full', 'full', '2xl', '4xl']}>
+            <Input
+              isDisabled={isDisabled}
+              cursor={isDisabled ? 'not-allowed' : 'default'}
+              placeholder="Nome do Vendedor"
+              width={['full', 'full', '52', '2xs']}
+              mr={['0', '0', '16']}
+              defaultValue={vendor.name}
+              {...register('vendors.0.name', {
+                maxLength: 250,
+                required: false
+              })}
+            />
+            <Stack
+              direction={['column', 'column', 'row']}
+              width="full"
+              spacing="5"
+            >
+              <ChakraReactSelect
+                mr={['0', '0', '3']}
+                disabled={isDisabled}
+                control={control}
+                creatable={false}
+                width={['full', 'full', 'xs', 'sm']}
+                defaultOptions={pixTypeOptions}
+                defaultValue={vendor.pixType}
+                defaultLabel={pixLabel}
+                placeholder="Tipo de Chave Pix"
+                {...register('vendors.0.pixType', {
+                  maxLength: 250,
+                  required: false
+                })}
+              />
+              <Input
+                cursor={isDisabled ? 'not-allowed' : 'default'}
+                placeholder="Chave Pix"
+                defaultValue={vendor.pixKey}
+                isDisabled={isDisabled}
+                width="full"
+                {...register('vendors.0.pixKey', {
+                  maxLength: 250,
+                  required: false
+                })}
+              />
+            </Stack>
+            <Input
+              cursor={isDisabled ? 'not-allowed' : 'default'}
+              placeholder="Email"
+              defaultValue={vendor.email}
+              isDisabled={isDisabled}
+              {...register('vendors.0.email', {
+                maxLength: 250,
+                required: false
+              })}
+            />
+          </Stack>
+        </FormControl>
+        {error && (
+          <Text mb="5" color="red" fontWeight="medium">
+            {error}
+          </Text>
+        )}
+      </form>
     </Box>
   )
 }
@@ -364,19 +315,12 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
   api.defaults.headers.common.Authorization = bearer
 
-  function formatPhone(value: string) {
-    const parents = value.replace(/^(\d{2})(\d)/g, '($1) $2') // Coloca parênteses em volta dos dois primeiros dígitos
-    const hifen = parents.replace(/(\d)(\d{4})$/, '$1-$2') // Coloca hífen entre o quarto e o quinto dígitos
-
-    return hifen
-  }
-
   return (await axios({
     method: 'GET',
     params: {
       id: ctx.params?.id
     },
-    url: '/order',
+    url: '/user',
     baseURL: process.env.API_URL,
     headers: {
       Authorization: `Bearer ${token}`
@@ -394,10 +338,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
       return {
         props: {
-          order: {
-            ...response.data[0],
-            phone: formatPhone(response.data[0].phone)
-          }
+          vendor: response.data[0]
         }
       }
     })
@@ -429,7 +370,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
             params: {
               id: ctx.params?.id
             },
-            url: '/order',
+            url: '/user',
             baseURL: process.env.API_URL,
             headers: {
               Authorization: newbearer
@@ -447,10 +388,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
           return {
             props: {
-              order: {
-                ...newResponse.data[0],
-                phone: formatPhone(newResponse.data[0].phone)
-              }
+              vendor: newResponse.data[0]
             }
           }
         } catch (error) {
@@ -467,9 +405,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
           }
         }
       }
-      /* eslint-disable */
-    })) as any
-    /* eslint-enable */
+    })) as GetServerSidePropsResult<IVendorFields>
 }
 
 export default Vendor

@@ -3,6 +3,7 @@ import { OptionTypeBase } from 'react-select'
 
 import { useRouter } from 'next/router'
 
+import { IFormValues } from '../../@types/vendor'
 import { api } from '../services/api'
 
 type NamesContextType = {
@@ -23,10 +24,10 @@ export const NamesProvider: React.FC = ({ children }) => {
 
       const users: OptionTypeBase[] = []
 
-      data.forEach(({ name }: { name: string }) => {
+      data.forEach(({ name, id }: IFormValues) => {
         users.push({
           label: name,
-          value: name
+          value: id
         })
       })
 

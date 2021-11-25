@@ -29,7 +29,7 @@ const Search: React.FC = () => {
             payment: undefined,
             phone: undefined,
             total: undefined,
-            vendor: undefined,
+            vendorId: undefined,
             initialDate: undefined,
             finalDate: undefined
           }
@@ -123,7 +123,6 @@ const Search: React.FC = () => {
             color: 'gray.200'
           }}
           width={['full', 'full', 'sm']}
-          mb="4"
           {...register('pedidos.0.cod', {
             minLength: 4,
             required: false,

@@ -16,10 +16,9 @@ import {
 } from '@chakra-ui/react'
 import ChakraReactSelect from 'src/components/ChakraReactSelect'
 import { NamesContext } from 'src/context/NamesContext'
-import { IOrder } from 'src/pages/order/[id]'
 import useSWR from 'swr'
 
-import { UseFormType } from '../../@types/pedidos'
+import { IOrder, UseFormType } from '../../@types/pedidos'
 import Input from '../components/FormInput'
 import RadioOptions from './RadioOptions'
 
@@ -163,9 +162,10 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           control={control}
           width={['full', 'full', 'xs', 'sm']}
           placeholder="Vendedor"
-          defaultValue={defaultValues?.vendor}
+          defaultValue={defaultValues?.vendor.id}
+          defaultLabel={defaultValues?.vendor.name}
           defaultOptions={users}
-          {...register(`pedidos.${index}.vendor`, {
+          {...register(`pedidos.${index}.vendorId`, {
             maxLength: 250,
             required: false
           })}
@@ -173,6 +173,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
         <Flex direction={['column', 'column', 'row']} width="full">
           <Input
             defaultValue={defaultValues?.customerName}
+            isDisabled={disabled}
             cursor={disabled ? 'not-allowed' : 'default'}
             placeholder="Nome do cliente"
             width={['full', 'full', '3xl']}
@@ -187,6 +188,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
             defaultValue={defaultValues?.phone}
             cursor={disabled ? 'not-allowed' : 'default'}
             placeholder="(00) 00000-0000"
+            isDisabled={disabled}
             type="tel"
             as={MaskInput}
             mask={maskValue}
@@ -207,6 +209,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           width="full"
           defaultOptions={descOptions}
           defaultValue={defaultValues?.description}
+          defaultLabel={defaultValues?.description}
           {...register(`pedidos.${index}.description`, {
             maxLength: 250,
             required: false
@@ -223,6 +226,11 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
                 '&:placeholder-shown': {
                   bgColor: '#d2d2d2'
                 }
+              }}
+              isDisabled={disabled}
+              _disabled={{
+                border: '1px solid rgba(91, 91, 91, 1);',
+                color: 'blackAlpha.700'
               }}
               defaultValue={defaultValues?.total}
               cursor={disabled ? 'not-allowed' : 'default'}
@@ -248,6 +256,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           <ChakraReactSelect
             disabled={disabled}
             defaultValue={defaultValues?.payment}
+            defaultLabel={defaultValues?.payment}
             control={control}
             defaultOptions={paymentOptions}
             width="full"
@@ -260,6 +269,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
         </Flex>
         <ChakraReactSelect
           defaultValue={defaultValues?.title}
+          defaultLabel={defaultValues?.title}
           defaultOptions={titleOptions}
           control={control}
           disabled={disabled}
@@ -283,6 +293,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
           defaultValue={defaultValues?.address}
           cursor={disabled ? 'not-allowed' : 'default'}
           placeholder="Endereço"
+          isDisabled={disabled}
           {...register(`pedidos.${index}.address`, {
             maxLength: 250,
             required: false
@@ -290,6 +301,7 @@ const FieldsContainer: React.FC<IFieldsContainer> = ({
         />
         <ChakraReactSelect
           defaultValue={defaultValues?.delivery}
+          defaultLabel={defaultValues?.delivery}
           disabled={disabled}
           defaultOptions={deliveryOptions}
           control={control}

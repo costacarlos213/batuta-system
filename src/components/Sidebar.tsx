@@ -1,5 +1,5 @@
 import React from 'react'
-import { Home, LogOut, Plus, Search } from 'react-feather'
+import { Home, LogOut, Plus, Search, Users } from 'react-feather'
 
 import { Box, Icon, Stack } from '@chakra-ui/react'
 import { useRouter } from 'next/dist/client/router'
@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
     >
       <Stack
         as="nav"
-        spacing="12"
+        spacing="10"
         alignItems="center"
         direction={['row', 'row', 'column']}
         justify={['center', 'center', 'flex-start']}
@@ -62,6 +62,15 @@ const Sidebar: React.FC = () => {
               as={Home}
               color="white"
               boxSize={['7', '7', '7', '7', '7', '10']}
+            />
+          </i>
+        </MenuItem>
+        <MenuItem to="/users">
+          <i>
+            <Icon
+              as={Users}
+              boxSize={['7', '7', '7', '7', '7', '10']}
+              color="white"
             />
           </i>
         </MenuItem>

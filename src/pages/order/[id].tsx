@@ -19,35 +19,22 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import tz from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  GetServerSidePropsResult
+} from 'next'
 import { useRouter } from 'next/dist/client/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ModalContent from 'src/components/ExcludeModal'
 import FieldsContainer from 'src/components/FieldsContainer'
 import FileUpload from 'src/components/FileUpload'
 import { api } from 'src/services/api'
+import { handleMultipleDelete } from 'src/utils/deleteMultiple'
 import { validateFiles } from 'src/utils/validateFiles'
 
-import { FormValues, UseFormType } from '../../../@types/pedidos'
+import { FormValues, IOrder, UseFormType } from '../../../@types/pedidos'
 import Input from '../../components/FormInput'
-
-export interface IOrder {
-  address: string
-  cod: string
-  color: 'green' | 'yellow'
-  title: string
-  comments: string
-  customerName: string
-  date: string
-  delivery: string
-  description: string
-  fileNames: string[]
-  id: string
-  payment: string
-  phone: string
-  total: string
-  vendor: string
-}
 
 dayjs.extend(utc)
 dayjs.extend(tz)
@@ -78,7 +65,7 @@ const Order: React.FC = ({
             phone: order.phone,
             total: order.total,
             comments: order.comments,
-            vendor: order.vendor,
+            vendorId: order.vendorId,
             color: order.color,
             title: order.title,
             initialDate: order.date
@@ -187,9 +174,6 @@ const Order: React.FC = ({
 
     api
       .put('/api/updateOrder', apiData)
-      .then(response => {
-        console.log(response.data)
-      })
       .catch(err => {
         if (err?.response?.status === 401) {
           router.push('/')
@@ -220,6 +204,7 @@ const Order: React.FC = ({
       >
         <ModalOverlay />
         <ModalContent
+          deleteFunction={handleMultipleDelete}
           onClose={onClose}
           checkedFields={[order]}
           title="Você deseja mesmo apagar esse pedido?"
@@ -244,8 +229,7 @@ const Order: React.FC = ({
             zIndex="9999"
             size="sm"
             mr={['0', '0', '5']}
-            visibility={isLoading ? 'visible' : 'hidden'}
-            display="block"
+            display={isLoading ? 'block' : 'none'}
           />
           <Stack
             spacing={5}
@@ -296,17 +280,16 @@ const Order: React.FC = ({
           </Stack>
         </Flex>
       </Flex>
-
       <Input
         cursor={'not-allowed'}
         placeholder="Código"
         isDisabled={isDisabled}
         _disabled={{
-          color: 'gray.200'
+          border: '1px solid rgba(91, 91, 91, 1);',
+          color: 'blackAlpha.700'
         }}
         width={['full', 'full', 'sm']}
         defaultValue={order.cod}
-        mb="3"
         sx={{
           '&:placeholder-shown': {
             bgColor: '#d2d2d2'
@@ -333,6 +316,7 @@ const Order: React.FC = ({
           mr={['0', '0', '6']}
           type="date"
           mb={['5', '5', '0']}
+          isDisabled={isDisabled}
           defaultValue={dayjs.utc(order.date).format().split('T')[0]}
           width="2xs"
           {...register('pedidos.0.initialDate')}
@@ -341,11 +325,16 @@ const Order: React.FC = ({
           placeholder="Observações"
           resize="none"
           defaultValue={order.comments}
+          isDisabled={isDisabled}
           size="md"
           h={['unset', 'unset', '32']}
           w={['full', 'full', 'xl']}
           _placeholder={{
             color: 'gray.200'
+          }}
+          _disabled={{
+            border: '1px solid rgba(91, 91, 91, 1);',
+            color: 'blackAlpha.700'
           }}
           borderColor="gray.500"
           _hover={{
@@ -489,9 +478,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
           }
         }
       }
-      /* eslint-disable */
-    })) as any
-    /* eslint-enable */
+    })) as GetServerSidePropsResult<IOrder>
 }
 
 export default Order

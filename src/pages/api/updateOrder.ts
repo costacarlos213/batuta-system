@@ -9,7 +9,7 @@ export const config = {
   }
 }
 
-const NewOrders = async (
+const UpdateOrder = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse> => {
@@ -71,4 +71,4 @@ const NewOrders = async (
   }
 }
 
-export default NewOrders
+export default UpdateOrder

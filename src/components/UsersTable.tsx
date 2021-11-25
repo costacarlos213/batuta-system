@@ -99,7 +99,7 @@ const UsersTable: React.FC<ITableContent> = ({ rows, setChecked, checked }) => {
               break
 
             default:
-              pixType = 'unset'
+              pixType = ''
               break
           }
 

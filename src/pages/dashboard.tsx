@@ -2,12 +2,17 @@ import React, { useState } from 'react'
 
 import { Box, ModalOverlay, Modal, useDisclosure } from '@chakra-ui/react'
 import axios from 'axios'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import {
+  GetServerSideProps,
+  GetServerSidePropsResult,
+  InferGetServerSidePropsType
+} from 'next'
 import router from 'next/router'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import ButtonGroup from 'src/components/ButtonGroup'
 import ModalContent from 'src/components/ExcludeModal'
 import { api } from 'src/services/api'
+import { handleMultipleDelete } from 'src/utils/deleteMultiple'
 import useSWR from 'swr'
 
 import Table from '../components/Table'
@@ -30,7 +35,7 @@ const Dashboard: React.FC = ({
           }
         })
         .then(response => {
-          console.log('Response')
+          console.log(response.data)
 
           if (response.data) {
             if (response.data.message === 'Invalid Session') {
@@ -80,6 +85,7 @@ const Dashboard: React.FC = ({
         <ModalContent
           onClose={onClose}
           checkedFields={checked}
+          deleteFunction={handleMultipleDelete}
           title="Você deseja mesmo apagar esse pedido?"
         />
       </Modal>
@@ -166,9 +172,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
           }
         }
       }
-      /* eslint-disable */
-    })) as any
-    /* eslint-enable */
+    })) as GetServerSidePropsResult<{ quantity: number }>
 }
 
 export default Dashboard

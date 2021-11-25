@@ -12,38 +12,37 @@ import {
   Text,
   Stack
 } from '@chakra-ui/react'
+import { AxiosResponse } from 'axios'
 import { useRouter } from 'next/dist/client/router'
-import { IOrder } from 'src/pages/order/[id]'
-import { api } from 'src/services/api'
+
+export interface IModalFunctionParams {
+  checkedFields?: (Record<string, unknown> | boolean)[]
+}
 
 interface IModalFunctions {
-  checkedFields?: (IOrder | boolean)[]
+  checkedFields?: (Record<string, unknown> | boolean)[]
   title: string
+  deleteFunction: ({
+    checkedFields
+  }: IModalFunctionParams) => Promise<AxiosResponse>
   onClose: () => void
 }
 
 const ModalContent: React.FC<IModalFunctions> = ({
   onClose,
+  deleteFunction,
   title,
   checkedFields
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleMultipleDelete = () => {
+  const handleDelete = () => {
     setIsLoading(true)
 
-    const filteredIds: IOrder[] = checkedFields?.filter(
-      item => typeof item !== 'boolean'
-    ) as IOrder[]
-    const onlyIds = filteredIds?.map(order => {
-      return { id: order.id }
-    })
+    console.log(checkedFields)
 
-    api
-      .delete('/api/deleteOrders', {
-        data: onlyIds
-      })
+    deleteFunction({ checkedFields })
       .then(() => {
         onClose()
         router.reload()
@@ -86,7 +85,7 @@ const ModalContent: React.FC<IModalFunctions> = ({
                 _hover={{
                   backgroundColor: '#d9e8f8'
                 }}
-                onClick={handleMultipleDelete}
+                onClick={handleDelete}
               >
                 Sim
               </Button>

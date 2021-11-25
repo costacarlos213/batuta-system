@@ -14,7 +14,8 @@ import dayjs from 'dayjs'
 import tz from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'next/router'
-import { IOrder } from 'src/pages/order/[id]'
+
+import { IOrder } from '../../@types/pedidos'
 
 dayjs.extend(utc)
 dayjs.extend(tz)
@@ -102,6 +103,8 @@ const DashboardTable: React.FC<ITableContent> = ({
       </Thead>
       <Tbody>
         {reverseRows.map((row, index) => {
+          console.log(row)
+
           return (
             <Tr
               key={row.id}
@@ -173,7 +176,7 @@ const DashboardTable: React.FC<ITableContent> = ({
                 whiteSpace="nowrap"
                 onClick={() => router.push(`/order/${row.id}`)}
               >
-                {row.vendor}
+                {row.vendor.name}
               </Td>
               <Td
                 px="2"

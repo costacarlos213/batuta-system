@@ -56,6 +56,11 @@ const Navbar: React.FC<FlexProps> = props => {
             Pesquisar pedidos
           </Text>
         </MenuItem>
+        <MenuItem to="/users">
+          <Text fontSize={['md', 'md', 'md', 'md', 'xl', '2xl']}>
+            Vendedores
+          </Text>
+        </MenuItem>
       </HStack>
       <Stack direction="row-reverse" spacing="6" alignItems="center">
         <MenuItem to="/new">

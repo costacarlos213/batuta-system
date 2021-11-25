@@ -3,7 +3,6 @@ import { Plus, Upload, X } from 'react-feather'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import {
-  border,
   Box,
   Button,
   Flex,
@@ -66,8 +65,6 @@ const New: React.FC = () => {
 
           if (message === 'Missing Name') {
             setError('Campo "Nome" inválido.')
-          } else {
-            setError(message)
           }
         }
       })
@@ -177,8 +174,8 @@ const New: React.FC = () => {
               as="fieldset"
               w="full"
               form="newForm"
-              borderBottomWidth={border ? 'thin' : 'none'}
-              marginBottom={border ? '4' : 0}
+              borderBottomWidth={index !== fields.length - 1 ? 'thin' : 'none'}
+              marginBottom={index !== fields.length - 1 ? '4' : 0}
               borderColor="#dfdfdf"
               pb="6"
             >
